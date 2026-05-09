@@ -1,0 +1,143 @@
+
+==============================================
+    🌐 COMPOSANTS D'UN RÉSEAU (CCNA 1 - Chapitre 1)
+==============================================
+
+🔹 Un réseau se compose de 3 grandes familles de composants :
+   1. Périphériques finaux (End Devices)
+   2. Périphériques intermédiaires (Intermediate Devices)
+   3. Supports réseau (Network Media)
+
+----------------------------------------------
+🏠 ARCHITECTURE CLIENT-SERVEUR
+----------------------------------------------
+
+🔹 Principe fondamental :
+   → Le serveur ATTEND les demandes (toujours actif).
+   → Le client INITIE la demande.
+
+Schéma de communication :
+    Client 💻 --(Requête)--> Internet/Reseau ☁️ --(Requête)--> Serveur
+    Client 💻 <--(Réponse)-- Internet/Reseau ☁️ <--(Réponse)-- Serveur
+
+🔹 Types de serveurs courants :
+
+   📧 Serveur Email :
+      → Fait fonctionner un logiciel de serveur de courrier.
+      → Clients : Outlook, Thunderbird, Gmail.
+
+   🌐 Serveur Web :
+      → Exécute un logiciel de serveur web (Apache, Nginx).
+      → Clients : Chrome, Firefox, Safari, Edge.
+
+   📁 Serveur de Fichiers :
+      → Stocke les fichiers des utilisateurs et de l’entreprise.
+      → Clients : Explorateur Windows, FTP Client.
+
+   🔍 Serveur DNS :
+      → Traduit les noms de domaine (ex: google.com) en adresses IP.
+      → Client : intégré à votre système d'exploitation.
+
+   📡 Serveur DHCP :
+      → Attribue AUTOMATIQUEMENT une adresse IP aux clients.
+      → Client : intégré à votre OS (requête au démarrage).
+
+----------------------------------------------
+🤝 ARCHITECTURE PEER-TO-PEER (P2P)
+----------------------------------------------
+
+🔹 Principe fondamental :
+   → Pas de serveur dédié. Chaque participant est à la fois
+     client (demandeur) ET serveur (fournisseur).
+   → Aussi appelé "groupe de travail" (Workgroup).
+
+✅ Avantages :
+   → Facile à configurer
+   → Moins complexe
+   → Réduction des coûts (pas de serveur dédié)
+   → Parfait pour des tâches simples (transfert de fichiers,
+      partage d'imprimante, petit réseau < 10 machines)
+
+❌ Inconvénients :
+   → Pas d’administration centralisée (pas de "chef")
+   → Peu sécurisé (chaque utilisateur gère sa propre sécurité)
+   → Non évolutif (difficile de passer à l'échelle)
+   → Performances plus lentes (chaque machine est sollicitée)
+
+----------------------------------------------
+🖥️ PÉRIPHÉRIQUES FINAUX (END DEVICES)
+----------------------------------------------
+
+🔹 Rôle :
+   → Génèrent OU reçoivent les données.
+   → Ce sont la "source" ou la "destination" de l'information.
+   → Un périphérique final GENÈRE les données.
+
+🔹 Exemples :
+   → PC, serveur, imprimante réseau
+   → Téléphone IP, tablette, smartphone
+   → Caméra IP (IoT)
+
+----------------------------------------------
+🔌 PÉRIPHÉRIQUES INTERMÉDIAIRES (INTERMEDIATE DEVICES)
+----------------------------------------------
+
+🔹 Rôle :
+   → Acheminent (dirigent) les données.
+   → Ne génèrent PAS les données, ils les gèrent.
+   → Permettent à l'information de circuler ENTRE les périphériques finaux.
+   → Un périphérique intermédiaire GÈRE les données.
+
+🔹 Principaux équipements :
+
+   📍 Switch (Commutateur) 
+   📍 Routeur 
+   🔥 Pare-feu (Firewall) 
+   📡 Point d'accès (WAP - Wireless Access Point) 
+   📟 Modem 
+
+----------------------------------------------
+🔧 SUPPORTS RÉSEAU (NETWORK MEDIA)
+----------------------------------------------
+
+🔹 Rôle :
+   → C'est le CHEMIN qu'emprunte l'information.
+   → Le "câble" (physique ou non) par lequel voyagent les données.
+
+🔹 Trois grandes familles :
+
+   1️⃣ Câble cuivre :
+      → Signal : impulsions électriques
+      → ✅ Pas cher, facile à installer
+      → ❌ Sensible aux interférences, distance limitée (100m max)
+      → Exemple : Câble RJ45 (Ethernet)
+
+   2️⃣ Fibre optique :
+      → Signal : impulsions lumineuses (laser/LED)
+      → ✅ Très grande distance (km), très haut débit
+      → ❌ Plus cher, fragile, installation complexe
+      → Exemple : Câble fibre (connecteurs LC, SC)
+
+   3️⃣ Transmission sans fil (Wireless) :
+      → Signal : ondes électromagnétiques
+      → ✅ Mobilité, pas de câble
+      → ❌ Sensible aux interférences (murs, autres ondes)
+      → Exemple : Wi-Fi, Bluetooth, 4G/5G
+
+----------------------------------------------
+📌 À RETENIR POUR L'EXAMEN CCNA
+----------------------------------------------
+
+1️⃣ Client → demande un service
+   Serveur → fournit un service
+
+2️⃣ Peer-to-Peer → tout le monde fait tout (simple mais limité)
+
+3️⃣ Trois familles de composants :
+   → Périphériques finaux (les bouts de la chaîne)
+   → Périphériques intermédiaires (l'aiguillage)
+   → Supports (le chemin)
+
+4️⃣ Différence clé :
+   → Périphérique final = génère/reçoit les données
+   → Périphérique intermédiaire = gère/transmet les données
