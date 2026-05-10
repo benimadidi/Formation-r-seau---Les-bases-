@@ -1,0 +1,165 @@
+
+==============================================
+    🗺️ TOPOLOGIES ET TYPES DE RÉSEAUX (CCNA 1 - Chapitre 1)
+==============================================
+
+🔹 Une topologie = la façon dont les périphériques sont organisés et connectés entre eux.
+   → Deux types de représentations : logique et physique.
+
+----------------------------------------------
+📐 DIAGRAMMES DE TOPOLOGIE
+----------------------------------------------
+
+🔹 Topologie physique :
+   → Illustre l'emplacement PHYSIQUE des dispositifs intermédiaires
+   → Montre l'installation des câbles (où passe le fil)
+   → Exemple : "Le switch est dans la salle 204, armoire réseau n°3"
+
+🔹 Topologie logique :
+   → Illustre les dispositifs, les PORTS et le SYSTÈME D'ADRESSAGE
+   → Montre comment les données circulent (le chemin logique)
+   → Exemple : "La communication passe par le port Gi0/1 du routeur, IP 192.168.1.1"
+
+💡 Différence clé :
+   Physique = où sont les câbles (le "plan de la salle")
+   Logique = comment communiquent les appareils (le "plan de circulation")
+
+----------------------------------------------
+🏷️ TYPES DE RÉSEAUX
+----------------------------------------------
+
+🔹 SOHO (Small Office Home Office) :
+   → Très petit réseau (maison, petit bureau, 3-5 personnes)
+   → Peu d'équipements, équipements de niveau basique
+   → Une simple box internet suffit pour se connecter
+   → Aussi appelé PAN (Personal Area Network)
+   → 📌 À retenir : réseau de très petite taille, souvent familial
+
+🔹 LAN (Local Area Network) - Réseau local :
+   → Périmètre géographique LIMITÉ (bâtiment, entreprise, université)
+   → Interconnecte des périphériques terminaux dans une zone restreinte
+   → Administré par une SEULE organisation ou un seul individu
+   → Fournit une bande passante HAUT DÉBIT aux appareils internes
+   → Exemple : réseau d'une entreprise à Kinshasa, d'un cabinet médical
+
+🔹 WAN (Wide Area Network) - Réseau étendu :
+   → Interconnecte des LAN sur de VASTES zones géographiques
+   → Exemple : relier un site à Kinshasa et un autre à Matadi
+   → WAN = la partie qui permet l'interconnexion des LAN
+   → Généralement géré par un ou plusieurs FOURNISSEURS DE SERVICES
+   → Fournit des liaisons à vitesse PLUS LENTE que le LAN
+
+----------------------------------------------
+🌍 INTERNET, INTRANET, EXTRANET
+----------------------------------------------
+
+🔹 ATTENTION distinction importante (sujet d'examen) :
+   Internet, Intranet, Extranet sont des RÉSEAUX APPLICATIFS.
+   LAN et WAN sont des RÉSEAUX PHYSIQUES/GÉOGRAPHIQUES.
+
+🔹 Internet :
+   → Ensemble de périphériques ou réseau interconnectés à l'échelle MONDIALE
+   → Réseau totalement à part, public
+   → Accessible à TOUT LE MONDE
+
+🔹 Intranet :
+   → Réseau privé d'une organisation (COMPANY ONLY)
+   → Utilise les technologies Internet (web, email)
+   → RESTREINT aux employés de l'entreprise
+   → Différent du LAN : l'intranet est une notion applicative
+
+🔹 Extranet :
+   → Extension de l'intranet à des partenaires EXTERNES
+   → Accessible à : fournisseurs, clients, collaborateurs
+   → Exemple : espace client d'une banque, portail fournisseur
+
+Tableau comparatif :
+    | Type       | Accès réservé à                          | Exemple                    |
+    |------------|------------------------------------------|----------------------------|
+    | Intranet   | Employés (company only)                  | Portail RH interne         |
+    | Extranet   | Fournisseurs, clients, partenaires       | Espace client Amazon       |
+    | Internet    | Tout le monde (the world)               | Google, YouTube, ChatGPT   |
+
+----------------------------------------------
+📡 CONNEXIONS À INTERNET (Moyens d'accès)
+----------------------------------------------
+
+🔹 Câble (Câble coaxial) :
+   → Internet à LARGE BANDE PASSANTE
+   → Toujours en service (toujours actif)
+   → Offert par les fournisseurs de TV par câble
+   → ✅ Débit élevé, ❌ Partagé avec les voisins
+
+🔹 DSL (Digital Subscriber Line) :
+   → Connexion HAUT DÉBIT, toujours active
+   → Passe par la ligne TELEPHONIQUE classique
+   → ✅ Pas besoin de nouveau câblage, ❌ Distance limitée (central téléphone)
+
+🔹 Cellulaire / Mobile (4G, 5G, LTE) :
+   → Utilise un réseau de téléphonie MOBILE
+   → Permet d'être connecté partout (couverture)
+   → ✅ Mobilité totale, ❌ Débit variable, quotas souvent limités
+
+🔹 Satellite :
+   → AVANTAGE MAJEUR : accessible dans les ZONES RURALES
+   → Idéal là où il n'y a pas de fournisseur internet
+   → ✅ Couverture mondiale, ❌ Latence élevée (signal va dans l'espace)
+
+🔹 Ligne commutée (Dial-up) :
+   → Option PEU COÛTEUSE mais à FAIBLE BANDE PASSANTE
+   → Utilise un modem sur la ligne téléphonique
+   → ❌ Très lent (56 kbps max), bloque la ligne téléphonique
+   → ⚠️ Quasiment disparu, mais à connaître pour l'examen
+
+----------------------------------------------
+🔗 RÉSEAUX CONVERGENTS (CONVERGED NETWORKS)
+----------------------------------------------
+
+🔹 Définition :
+   → Réseau qui permet de faire passer la DONNÉE, la VIDÉO,
+     et l'APPEL TÉLÉPHONIQUE sur le MÊME SUPPORT réseau.
+
+🔹 Avant (réseaux spécialisés) :
+   → Un câble pour le téléphone
+   → Un autre câble pour la TV
+   → Un autre câble pour Internet
+   → Trois infrastructures séparées !
+
+🔹 Maintenant (réseau convergent) :
+   → Une seule infrastructure (IP) pour TOUT
+   → Une box internet = téléphone (VoIP) + TV + Internet
+   → ✅ Économies, simplicité, évolution facilitée
+
+Exemple concret :
+    Une Freebox / Livebox / Bbox moderne :
+    ┌─────────────────────────────────────┐
+    │         BOX INTERNET                │
+    ├─────────────────────────────────────┤
+    │ 📞 Téléphone   (VoIP)               │
+    │ 📺 TV IP       (streaming, replay)  │
+    │ 💻 Internet    (navigateur, mail)   │
+    │ 📁 Cloud       (stockage en ligne)  │
+    └─────────────────────────────────────┘
+           │
+      Une seule connexion (fibre, ADSL, 4G...)
+
+----------------------------------------------
+📌 À RETENIR 
+----------------------------------------------
+
+1️⃣ Deux types de topologies :
+   → Physique = EMPLACEMENT des câbles et équipements
+   → Logique = PORTS et ADRESSAGE (comment circulent les données)
+
+2️⃣ Hiérarchie des réseaux (du plus petit au plus grand) :
+   SOHO/PAN < LAN < WAN < Internet
+
+3️⃣ LAN = zone limitée, haut débit, une seule organisation
+   WAN = zone étendue, moins rapide, plusieurs fournisseurs
+
+4️⃣ Intranet (entreprise seule) ≠ Extranet (avec partenaires) ≠ Internet (le monde)
+
+5️⃣ Cinq moyens de connexion à connaître :
+   Câble, DSL, Cellulaire, Satellite, Ligne commutée
+
+6️⃣ Réseau convergent = tout (voix, vidéo, données) sur le même support
