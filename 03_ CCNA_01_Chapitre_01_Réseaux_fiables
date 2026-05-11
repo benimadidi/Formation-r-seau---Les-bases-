@@ -1,0 +1,196 @@
+/*
+==============================================
+    🛡️ RÉSEAUX FIABLES (CCNA 1 - Chapitre 1)
+==============================================
+
+🔹 Quand on met en place un réseau d'entreprise,
+   il faut penser à des éléments qui rassurent :
+   → Le management
+   → Les utilisateurs
+   → Toutes les parties prenantes
+
+🔹 Constat :
+   → Une fois le réseau en place, l'entreprise a une
+     DÉPENDANCE TOTALE envers son réseau.
+   → Sans réseau fiable = plus de travail possible.
+
+🔹 Pour être fiable, un réseau doit respecter 4 CRITÈRES :
+   1. Tolérance aux pannes (Fault Tolerance)
+   2. Scalabilité / Évolutivité (Scalability)
+   3. Qualité de service (QoS - Quality of Service)
+   4. Sécurité (Security)
+
+----------------------------------------------
+🔧 1. TOLÉRANCE AUX PANNES (FAULT TOLERANCE)
+----------------------------------------------
+
+🔹 Définition :
+   → Une panne (support, périphérique intermédiaire, équipement)
+     ne doit pas impacter le fonctionnement global du réseau.
+   → Si impact, il doit être limité à un périmètre TRÈS RESTREINT.
+
+🔹 Objectif principal :
+   → Éviter le SPOF (Single Point Of Failure)
+
+🔹 SPOF = Single Point Of Failure :
+   → C'est un point UNIQUE dans le réseau.
+   → Si ce point tombe en panne → TOUT tombe.
+   → À éliminer ABSOLUMENT dans un réseau fiable.
+
+🔹 Comment éviter le SPOF ?
+   → Redondance : doubler les équipements critiques
+   → Chemins alternatifs : plusieurs routes pour les données
+   → Exemple : deux routeurs au lieu d'un, deux switchs
+
+Schéma SPOF vs Tolérance aux pannes :
+
+    ❌ AVEC SPOF :
+        [PC] --- [SWITCH UNIQUE] --- [Serveur]
+                    ↑
+              Si le switch tombe → TOUT est coupé !
+
+    ✅ SANS SPOF (redondance) :
+        [PC] --- [SWITCH A] --- [Serveur]
+               ↗
+        [PC] --- [SWITCH B] --- [Serveur]
+              Si A tombe, B prend le relais
+
+----------------------------------------------
+📈 2. SCALABILITÉ / ÉVOLUTIVITÉ (SCALABILITY)
+----------------------------------------------
+
+🔹 Définition :
+   → De nouveaux utilisateurs et des réseaux entiers peuvent
+     être connectés SANS détériorer les performances
+     des utilisateurs existants.
+
+🔹 Caractéristiques d'un réseau scalable :
+   → Peut passer de 10 à 1000 utilisateurs sans tout changer
+   → La bande passante s'adapte (augmente avec les besoins)
+   → L'architecture est modulaire (on ajoute des blocs)
+
+🔹 Exemple :
+   → Un réseau scalable :
+     Ajout d'un nouveau service (télétravail, 50 personnes)
+     → Les anciens utilisateurs ne voient pas de ralentissement
+
+   → Un réseau NON scalable :
+     Ajout d'une imprimante réseau
+     → Tout le monde rame !
+
+----------------------------------------------
+🎯 3. QUALITÉ DE SERVICE (QoS - QUALITY OF SERVICE)
+----------------------------------------------
+
+🔹 Définition :
+   → La QoS, gérée par le routeur, permet d'attribuer des PRIORITÉS
+     selon le type de communication et son importance
+     pour l'organisation.
+
+🔹 Principe de base :
+   → Toutes les données ne se valent pas.
+   → Certaines communications sont prioritaires.
+
+🔹 Exemples concrets :
+
+   🌐 Pages web (HTTP/HTTPS) :
+      → Peuvent recevoir une PRIORITÉ BASSE
+      → Un temps de chargement un peu plus long est acceptable
+
+   📞 Appel VoIP (Voice over IP) :
+      → Besoin d'une PRIORITÉ HAUTE
+      → Pour maintenir une expérience fluide et sans interruption
+      → La moindre latence = conversation hachée, désagréable
+
+   🎥 Vidéo (Visio, streaming) :
+      → PRIORITÉ MOYENNE à HAUTE
+      → Besoin de stabilité (éviter les freeze)
+
+   📧 Email :
+      → PRIORITÉ TRÈS BASSE
+      → Un email qui arrive 2 secondes plus tard n'est pas grave
+
+Schéma de priorisation QoS :
+
+    🚨 URGENT (VoIP)    →═══→   Passe en premier
+    ⚠️ NORMAL (Vidéo)   →══→   Attend un peu
+    📝 BAS (Web)        →═→    Attend
+    💤 TRÈS BAS (Email) →→     Attend longtemps
+
+----------------------------------------------
+🔒 4. SÉCURITÉ (SECURITY)
+----------------------------------------------
+
+🔹 Définition :
+   → Les administrateurs protègent le réseau avec :
+     - Sécurité LOGICIELLE (firewall, antivirus, ACL)
+     - Sécurité MATÉRIELLE (équipements sécurisés)
+     - Empêcher l'accès PHYSIQUE aux équipements réseau
+
+🔹 Les 3 piliers de la sécurité réseau (triade CID) :
+
+   🔐 Confidentialité :
+      → Seules les personnes AUTORISÉES peuvent accéder aux données
+      → Exemples : chiffrement (TLS/SSL), mots de passe, VPN
+      → Une donnée confidentielle ne doit pas être lue par n'importe qui
+
+   ✓ Intégrité :
+      → Les données ne sont pas MODIFIÉES pendant leur transmission
+      → Exemples : hachage (SHA, MD5), signatures numériques
+      → Ce qui est envoyé = ce qui est reçu (pas d'altération)
+
+   ⏰ Disponibilité (Availability) :
+      → Les données et services sont ACCESSIBLES quand on en a besoin
+      → Exemples : redondance, sauvegardes, anti-DDoS
+      → Le réseau doit être disponible H24, 7j/7
+
+----------------------------------------------
+📊 RÉCAPITULATIF DES 4 CRITÈRES
+----------------------------------------------
+
+    ┌────────────────────────────────────────────────────────────┐
+    │                    RÉSEAU FIABLE                           │
+    ├───────────────┬────────────────────────────────────────────┤
+    │ 1. Tolérance  │ Éviter le SPOF, redondance, chemins        │
+    │    aux pannes │ alternatifs → pas d'interruption totale    │
+    ├───────────────┼────────────────────────────────────────────┤
+    │ 2. Scalabilité│ Ajouter des utilisateurs SANS ralentir     │
+    │               │ les anciens                                │
+    ├───────────────┼────────────────────────────────────────────┤
+    │ 3. QoS        │ Prioriser : VoIP > Vidéo > Web > Email     │
+    │               │ Géré par le routeur                        │
+    ├───────────────┼────────────────────────────────────────────┤
+    │ 4. Sécurité   │ Confidentialité + Intégrité + Disponibilité│
+    └───────────────┴────────────────────────────────────────────┘
+
+----------------------------------------------
+📌 À RETENIR 
+----------------------------------------------
+
+1️⃣ Les 4 critères d'un réseau fiable :
+   → Fault Tolerance, Scalability, QoS, Security
+
+2️⃣ SPOF = Single Point Of Failure = le point unique qui fait tout tomber
+   → La tolérance aux pannes élimine les SPOF par la redondance
+
+3️⃣ La QoS donne la priorité à la VOIX (VoIP) avant le WEB
+
+4️⃣ Les 3 piliers de la sécurité : Confidentialité, Intégrité, Disponibilité
+
+5️⃣ Un réseau scalable grandit SANS pénaliser les utilisateurs existants
+
+----------------------------------------------
+🧠 EXEMPLES POUR BIEN COMPRENDRE
+----------------------------------------------
+
+🚗 Analogie routière :
+   → Tolérance aux pannes : plusieurs itinéraires si un pont est coupé
+   → Scalabilité : autoroute qui peut passer de 2 à 4 voies
+   → QoS : voie de covoiturage (priorité aux bus et taxis)
+   → Sécurité : barrières, péages, caméras
+
+🏢 Exemple entreprise :
+   → Panne d'un switch : la redondance bascule sur l'autre (tolérance)
+   → Embauche 50 personnes : le réseau suit sans ralentir (scalabilité)
+   → Visio conférence : prioritaire sur le téléchargement (QoS)
+   → Mot de passe + chiffrement : que les employés voient les données (sécurité)
