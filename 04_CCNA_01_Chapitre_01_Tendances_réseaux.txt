@@ -1,0 +1,185 @@
+
+==============================================
+    📈 TENDANCES RÉSEAUX (CCNA 1 - Chapitre 1)
+==============================================
+
+🔹 La tendance réseaux = le FUTUR du réseau.
+   → Ce qui va caractériser les réseaux de demain.
+
+🔹 Les grandes tendances à connaître :
+   1. BYOD (Bring Your Own Device)
+   2. Cloud Computing
+   3. Collaboration en ligne
+   4. (Autres : IoT, automatisation, sécurité zero trust)
+
+----------------------------------------------
+📱 1. BYOD (BRING YOUR OWN DEVICE)
+----------------------------------------------
+
+🔹 Définition :
+   → BYOD = Bring Your Own Device
+   → En français : "Apporte ton propre matériel"
+
+🔹 Concept :
+   → Plus besoin d'utiliser le PC de l'entreprise
+   → Les employés peuvent utiliser LEUR propre appareil
+     (smartphone, tablette, PC personnel)
+
+🔹 Comment ça fonctionnait AVANT (ancien modèle) :
+   → Données de l'entreprise stockées DANS l'entreprise
+   → Pour y accéder : obligé d'utiliser le PC de l'entreprise
+   → Le PC entreprise avait un CERTIFICAT DE SÉCURITÉ
+   → Connexion au réseau entreprise = accès sécurisé aux données
+
+🔹 Comment ça fonctionne MAINTENANT (avec BYOD) :
+   → L'employé utilise SON propre appareil
+   → L'appareil se connecte au réseau entreprise
+   → MAIS il doit d'abord passer par le NAC (Network Admission Control)
+
+🔹 NAC (Network Admission Control) :
+   → Équipement qui CONTRÔLE les accès au réseau
+   → Vérifie que l'appareil respecte les exigences de sécurité
+   → Technologie Cisco : ISE (Identity Services Engine)
+
+🔹 Ce que le NAC peut vérifier (conditions d'accès) :
+   → ✅ Antivirus présent et à jour
+   → ✅ Système d'exploitation (Windows, macOS) à jour
+   → ✅ Certificat d'entreprise valide
+   → ✅ Pas de logiciels malveillants
+   → ✅ Mises à jour de sécurité installées
+
+🔹 Association BYOD + Cloud :
+   → Le BYOD est associé au Cloud Computing
+   → Les données ne sont plus forcément DANS l'entreprise
+   → Le Cloud permet l'accès sécurisé depuis n'importe où
+
+Schéma du BYOD avec NAC :
+
+    [Appareil personnel] 
+           ↓
+    [NAC / ISE] ← Contrôle : antivirus, mises à jour, certificat
+           ↓
+    [Cloud de l'entreprise]
+           ↓
+    Données accessibles (si vérification OK)
+
+----------------------------------------------
+☁️ 2. CLOUD COMPUTING
+----------------------------------------------
+
+🔹 Définition :
+   → Le Cloud = des serveurs distants accessibles via Internet
+   → On y stocke des données, on y exécute des applications
+   → On paye souvent à l'usage (consommation)
+
+🔹 Les 3 types de Cloud :
+
+   🌐 Cloud PUBLIC :
+      → Proposé par des fournisseurs tiers
+      → Accessible à tout le monde (moyennant paiement)
+      → Les 3 plus célèbres :
+         - ☁️ Microsoft (Azure, Office 365)
+         - ☁️ Google (Google Cloud, Google Drive)
+         - ☁️ Amazon (AWS - Amazon Web Services)
+      → Exemples : Gmail, Dropbox, iCloud
+
+   🏢 Cloud PRIVÉ :
+      → Développé par l'entreprise POUR elle-même
+      → Hébergé dans ses propres data centers
+      → Entièrement contrôlé par l'entreprise
+      → ✅ Sécurité maximale, ❌ Coût élevé
+
+   🔄 Cloud HYBRIDE :
+      → Mélange de cloud public ET privé
+      → Données sensibles → cloud privé
+      → Données moins sensibles / pics d'activité → cloud public
+      → ✅ Meilleur des deux mondes
+
+🔹 Avantages du Cloud :
+   → Accessible partout (avec Internet)
+   → Pas de gestion du matériel
+   → Évolutif (on paye ce qu'on consomme)
+   → Sauvegarde automatique
+
+----------------------------------------------
+🤝 3. COLLABORATION EN LIGNE
+----------------------------------------------
+
+🔹 Définition :
+   → Travailler ensemble à distance, en temps réel
+   → Outils qui permettent la communication et le partage
+
+🔹 Outils de collaboration (exemples) :
+   → Cisco WebEx (solution Cisco)
+   → Microsoft Teams
+   → Zoom
+   → Slack
+   → Google Meet
+
+🔹 Fonctionnalités typiques :
+   → Visioconférence (avec caméra)
+   → Partage d'écran
+   → Messagerie instantanée (chat)
+   → Salles de réunion virtuelles
+   → Travail collaboratif sur documents (Google Docs)
+
+----------------------------------------------
+📡 AUTRES TENDANCES À CONNAÎTRE (pour l'examen)
+----------------------------------------------
+
+🔹 IoT (Internet of Things) - Objets connectés :
+   → Objets du quotidien connectés à Internet
+   → Exemples : ampoules, thermostats, frigos, montres, capteurs
+   → Défi : sécurité et gestion des milliards d'appareils
+
+🔹 Automatisation du réseau (SDN, controller-based) :
+   → Gestion centralisée du réseau
+   → Les équipements sont programmables
+   → Réduction des erreurs humaines
+
+🔹 Zero Trust Security (Confiance zéro) :
+   → Ne faire confiance à PERSONNE par défaut
+   → Vérifier TOUTE tentative d'accès
+   → Même de l'intérieur de l'entreprise
+
+----------------------------------------------
+📊 RÉCAPITULATIF DES TENDANCES
+----------------------------------------------
+
+    ┌─────────────────────────────────────────────────────────┐
+    │              TENDANCES DES RÉSEAUX FUTURS               │
+    ├───────────────────┬─────────────────────────────────────┤
+    │ BYOD              │ Apporte ton propre appareil         │
+    │                   │ Contrôle via NAC (Cisco ISE)        │
+    ├───────────────────┼─────────────────────────────────────┤
+    │ Cloud Computing   │ Public (Azure, GCP, AWS)            │
+    │                   │ Privé (entreprise seule)            │
+    │                   │ Hybride (mélange public+privé)      │
+    ├───────────────────┼─────────────────────────────────────┤
+    │ Collaboration     │ Cisco WebEx, Teams, Zoom            │
+    │ en ligne          │ Visio, partage d'écran, chat        │
+    ├───────────────────┼─────────────────────────────────────┤
+    │ IoT               │ Objets connectés                    │
+    ├───────────────────┼─────────────────────────────────────┤
+    │ Automatisation    │ Réseaux programmables               │
+    └───────────────────┴─────────────────────────────────────┘
+
+----------------------------------------------
+📌 À RETENIR 
+----------------------------------------------
+
+1️⃣ BYOD = Bring Your Own Device
+   → Les employés utilisent leurs propres appareils
+   → Sécurité via NAC (Cisco ISE)
+
+2️⃣ NAC = Network Admission Control
+   → Vérifie antivirus, mises à jour, certificat AVANT accès
+
+3️⃣ Cloud :
+   → Public = Microsoft, Google, Amazon
+   → Privé = l'entreprise elle-même
+   → Hybride = mélange des deux
+
+4️⃣ Collaboration Cisco = WebEx
+
+5️⃣ Le BYOD est associé au Cloud Computing
