@@ -1,0 +1,143 @@
+
+==============================================
+    🧭 NAVIGATION DANS CISCO IOS (CCNA 1 - Chapitre 2)
+==============================================
+
+🔹 Une fois le switch connecté au PC (via câble console) :
+   → Ouvrir l'émulateur de terminal (PuTTY, etc.)
+   → Se connecter au switch
+
+----------------------------------------------
+📋 LES 3 MODES PRINCIPAUX DE CISCO IOS
+----------------------------------------------
+
+    ┌─────────────────────────────────────────────────────────┐
+    │                    MODES IOS                            │
+    ├───────────────────────────┬─────────────────────────────┤
+    │ ① User EXEC Mode          │ Niveau utilisateur (basique)│
+    │    Switch>                │ Droits limités              │
+    ├───────────────────────────┼─────────────────────────────┤
+    │ ② Privileged EXEC Mode    │ Niveau administrateur       │
+    │    Switch#                │ Maintenance, vérification   │
+    ├───────────────────────────┼─────────────────────────────┤
+    │ ③ Global Configuration Mode│ Configuration des paramètres│
+    │    Switch(config)#        │ Ajout, modification, supression│
+    └───────────────────────────┴─────────────────────────────┘
+
+----------------------------------------------
+① MODE D'EXÉCUTION UTILISATEUR (USER EXEC MODE)
+----------------------------------------------
+
+🔹 Prompt caractéristique :
+   → Switch>   (le ">" est important)
+
+🔹 Rôle :
+   → Commandes de base pour les utilisateurs
+   → Droits TRÈS LIMITÉS
+   → On ne peut presque rien faire
+
+🔹 Commandes disponibles (les plus basiques) :
+   → Quelques commandes d'affichage
+   → Impossible de modifier la configuration
+
+📌 À retenir :
+   → On ne peut faire que TRÈS PEU de choses en mode utilisateur
+
+----------------------------------------------
+② MODE PRIVILÉGIÉ (PRIVILEGED EXEC MODE)
+----------------------------------------------
+
+🔹 Pour y accéder :
+   → Taper la commande : enable
+
+🔹 Prompt caractéristique :
+   → Switch#   (le "#" remplace le ">")
+
+🔹 Rôle :
+   → Accès DÉDIÉ À LA MAINTENANCE
+   → Vérification de l'équipement
+   → Consultation de l'état du switch
+   → On peut VOIR mais pas encore MODIFIER la configuration
+
+🔹 Autres noms :
+   → Mode administrateur
+   → Mode privilégié
+   → Enable mode
+
+🔹 Commande clock (exemple) :
+   → clock set 10:30:00 15 May 2026
+   → Permet de régler l'horloge du switch
+   → Utile pour l'horodatage des logs
+
+----------------------------------------------
+③ MODE DE CONFIGURATION GLOBALE (GLOBAL CONFIGURATION MODE)
+----------------------------------------------
+
+🔹 Pour y accéder (depuis le mode privilégié) :
+   → Taper : configure terminal
+   → Version courte : conf t
+
+🔹 Prompt caractéristique :
+   → Switch(config)#
+
+🔹 Rôle (le PLUS IMPORTANT) :
+   → C'est quoi une configuration ?
+        • Ajouter des éléments
+        • Modifier des éléments existants
+        • Supprimer des éléments
+        • Modifier le fonctionnement de l'équipement
+
+----------------------------------------------
+❓ AIDE ET DÉPANNAGE DES COMMANDES
+----------------------------------------------
+
+🔹 Le point d'interrogation (?) :
+   → Affiche TOUTES les commandes disponibles dans le mode actuel
+   → Exemple : Switch> ?
+
+🔹 Comment voir les options d'une commande :
+   → Taper la commande + espace + ?
+   → Exemple : Switch# clock ?
+
+    Switch# clock ?
+      set     Set the time and date
+
+🔹 Autres messages d'erreur :
+
+   | Message d'erreur                 | Signification                          |
+   |----------------------------------|----------------------------------------|
+   | % Invalid input detected         | Commande inexistante ou mal tapée      |
+   | % Incomplete command             | Il manque des options obligatoires     |
+   | % Ambiguous command              | Plusieurs commandes commencent pareil  |
+
+----------------------------------------------
+🔄 RÉCAPITULATIF DES CHANGEMENTS DE MODE
+----------------------------------------------
+
+    Switch>                     ← Mode Utilisateur (droits basiques)
+       │
+       │ enable
+       ↓
+    Switch#                     ← Mode Privilégié (maintenance, vérif)
+       │
+       │ configure terminal
+       ↓
+    Switch(config)#             ← Mode Configuration Globale (modification)
+
+
+----------------------------------------------
+📌 À RETENIR 
+----------------------------------------------
+
+1️⃣ 3 MODES PRINCIPAUX :
+   → Switch>    = utilisateur (lecture seule basique)
+   → Switch#    = privilégié (maintenance, vérification)
+   → Switch(config)# = config globale (modification)
+
+2️⃣ enable    → passe du mode utilisateur au mode privilégié
+
+3️⃣ configure terminal ou conf t → passe du mode privilégié au mode config
+
+4️⃣ ? (point d'interrogation) → aide, liste les commandes disponibles
+
+5️⃣ Commande + espace + ? → liste les options disponibles
