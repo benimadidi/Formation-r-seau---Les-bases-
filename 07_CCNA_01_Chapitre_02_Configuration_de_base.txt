@@ -1,0 +1,187 @@
+
+==============================================
+    ⚙️ CONFIGURATION DE BASE (CCNA 1 - Chapitre 2)
+==============================================
+
+🔹 Objectif :
+   → Comment procéder à la configuration d'un équipement Cisco
+   → Commandes essentielles pour démarrer
+
+----------------------------------------------
+🏠 MODE DE CONFIGURATION GLOBALE (GLOBAL CONFIG)
+----------------------------------------------
+
+🔹 Pourquoi "global" ?
+   → Permet de configurer GLOBALEMENT l'équipement
+   → On n'est pas dans un périmètre spécifique
+   → Les modifications s'appliquent à TOUT l'équipement
+     (sauf si surchargées par un sous-mode)
+
+🔹 Prompt :
+   → Switch(config)#
+
+🔹 Accès :
+    Switch# configure terminal
+    Switch(config)#
+
+----------------------------------------------
+📂 SOUS-MODES DE CONFIGURATION
+----------------------------------------------
+
+🔹 Principe :
+   → Après le mode global, on peut entrer dans des sous-modes
+   → Chaque sous-mode sert à configurer un ÉLÉMENT SPÉCIFIQUE
+
+🔹 Principaux sous-modes :
+
+   | Sous-mode          | Commande d'accès        | Prompt résultant        |
+   |--------------------|-------------------------|-------------------------|
+   | Interface          | interface g0/1          | Switch(config-if)#      |
+   | Ligne (console)    | line console 0          | Switch(config-line)#    |
+   | Ligne (vty)        | line vty 0 15           | Switch(config-line)#    |
+   | Routage            | router ospf 1           | Switch(config-router)#  |
+
+
+🔹 Pourquoi des sous-modes ?
+   → Interface : configurer un port spécifique (IP, vitesse, etc.)
+   → Ligne : configurer les accès (console, Telnet, SSH)
+   → Routage : configurer les protocoles de routage
+
+----------------------------------------------
+↩️ RETOURNER AU MODE PRIVILÉGIÉ
+----------------------------------------------
+
+🔹 Commande : end
+   → Permet de revenir DIRECTEMENT en mode privilégié
+   → Peu importe où on se trouve (global, sous-mode, etc.)
+
+🔹 Autres commandes de retour :
+   → exit : revient d'UN niveau seulement
+   → end : revient DIRECTEMENT au mode privilégié (#)
+   → Ctrl+Z : raccourci clavier pour end
+
+----------------------------------------------
+🏷️ COMMANDE HOSTNAME
+----------------------------------------------
+
+🔹 Utilité :
+   → Donner un NOM à l'équipement
+   → Permet de l'identifier dans le réseau
+
+🔹 Syntaxe :
+    Switch(config)# hostname NOM
+
+🔹 Règles importantes :
+   → Les COMMANDES ne sont PAS sensibles à la casse
+     (HOSTNAME = hostname = HoStNaMe)
+   → Les NOMS (paramètres) sont sensibles à la casse
+     (Switch et switch sont différents)
+
+🔹 Convention :
+   → On écrit les noms en MAJUSCULES par convention
+   → Plus lisible, standard dans l'industrie
+
+🔹 Pour supprimer/remettre à défaut :
+    SWITCH_PARIS(config)# no hostname
+    Switch(config)#
+
+----------------------------------------------
+👁️ COMMANDE SHOW RUNNING-CONFIG
+----------------------------------------------
+
+🔹 Utilité :
+   → Afficher la configuration EN COURS
+   → Configuration ACTIVE dans la RAM
+   → Modifiée en temps réel
+
+🔹 Syntaxe (depuis mode privilégié #) :
+    Switch# show running-config
+
+🔹 Ce qu'on y trouve :
+   → Hostname
+   → Mots de passe
+   → Configuration des interfaces
+   → Toutes les modifications depuis le dernier démarrage
+
+🔹 Caractéristiques :
+   → VOLATILE : perdue si l'équipement redémarre (sans sauvegarde)
+   → Modifiable en direct par les commandes configure
+
+----------------------------------------------
+💾 COMMANDE SHOW STARTUP-CONFIG
+----------------------------------------------
+
+🔹 Utilité :
+   → Afficher la configuration SAUVEGARDÉE
+   → Configuration stockée dans la NVRAM
+
+🔹 Syntaxe (depuis mode privilégié #) :
+    Switch# show startup-config
+
+🔹 Ce qu'on y trouve :
+   → Configuration qui sera chargée au prochain démarrage
+   → État sauvegardé par la commande : copy running-config startup-config
+
+----------------------------------------------
+🔄 COMMANDE RELOAD
+----------------------------------------------
+
+🔹 Utilité :
+   → Redémarrer l'équipement
+   → Provoque un reboot complet
+
+🔹 Syntaxe (depuis mode privilégié #) :
+    Switch# reload
+
+🔹 Comportement :
+   → Le switch demande confirmation
+   → Si configuration non sauvegardée → perte des modifications
+   → Après reboot, chargement de la startup-config
+
+🔹 Exemple :
+    Switch# reload
+    System configuration has been modified. Save? [yes/no]: no
+    Proceed with reload? [confirm] yes
+
+    (l'équipement redémarre)
+
+----------------------------------------------
+💿 SAUVEGARDE DE LA CONFIGURATION
+----------------------------------------------
+
+🔹 Règle d'or (à retenir ABSOLUMENT) :
+   → Toujours sauvegarder la configuration EN AVANÇANT
+   → Après chaque modification importante
+
+🔹 Commande de sauvegarde :
+    Switch# copy running-config startup-config
+    (version courte : Switch# copy run start)
+
+🔹 Exemple complet de workflow :
+    Switch# configure terminal
+    Switch(config)# hostname MON_SWITCH
+    MON_SWITCH(config)# exit
+    MON_SWITCH# copy running-config startup-config
+    Destination filename [startup-config]? (appuyer sur Entrée)
+    Building configuration...
+    [OK]
+
+----------------------------------------------
+📌 À RETENIR
+----------------------------------------------
+
+1️⃣ Mode global (config#) = config générale de l'équipement
+
+2️⃣ Sous-modes = config spécifique (interface, line, router)
+
+3️⃣ end = retour direct au mode privilégié (depuis n'importe où)
+
+4️⃣ hostname = nommer l'équipement (commandes insensibles à la casse, NOMS sensibles)
+
+5️⃣ running-config = config ACTIVE (RAM, VOLATILE)
+
+6️⃣ startup-config = config SAUVEGARDÉE (NVRAM, PERSISTANTE)
+
+7️⃣ copy running-config startup-config = SAUVEGARDER ! (toujours)
+
+8️⃣ reload = redémarrer l'équipement
