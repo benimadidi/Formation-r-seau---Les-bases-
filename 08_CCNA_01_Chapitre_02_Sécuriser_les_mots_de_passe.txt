@@ -1,0 +1,167 @@
+
+==============================================
+    🔐 SÉCURISER LES MOTS DE PASSE (CCNA 1 - Chapitre 2)
+==============================================
+
+🔹 Objectif :
+   → Protéger l'accès aux équipements réseau
+   → Empêcher les accès non autorisés
+
+----------------------------------------------
+📝 COMMANDE enable password
+----------------------------------------------
+
+🔹 Utilité :
+   → Demander un mot de passe après la commande enable
+   → Protège le passage en mode privilégié (#)
+
+🔹 Syntaxe (depuis mode config global) :
+    Switch(config)# enable password MOT_DE_PASSE
+
+🔹 Exemple :
+    Switch(config)# enable password cisco123
+
+🔹 Problème majeur :
+   → Mot de passe visible en CLAIR dans la configuration
+   → show running-config affiche le mot de passe !
+
+   Exemple :
+    Switch# show running-config
+    ...
+    enable password cisco123   ← Visible par tous !
+    ...
+
+----------------------------------------------
+🔐 CHIFFREMENT : service password encryption
+----------------------------------------------
+
+🔹 Problème à résoudre :
+   → Comment rendre le mot de passe NON visible en clair ?
+   → Solution : le CHIFFREMENT
+
+🔹 Commande :
+    Switch(config)# service password encryption
+
+🔹 Algorithme utilisé :
+   → Cisco type 7 (chiffrement propriétaire Cisco)
+
+🔹 Résultat dans running-config :
+    enable password 7 0832455D1A0E18   ← Chiffré (type 7)
+
+🔹 ⚠️ LIMITATION MAJEURE :
+   → Cet algorithme est TRÈS SIMPLE
+   → De nombreux sites web permettent de DÉCHIFFRER le type 7
+   → Ce n'est pas sécurisé !
+
+🔹 Chiffrement vs Déchiffrement :
+   → Chiffrement : mot de passe + clé → texte chiffré
+   → Déchiffrement : texte chiffré + clé → mot de passe (RÉVERSIBLE)
+
+----------------------------------------------
+🔨 HASHAGE : enable secret (LA BONNE MÉTHODE)
+----------------------------------------------
+
+🔹 Définition du HASHAGE :
+   → Transformation à sens unique
+   → Impossible de retrouver le mot de passe d'origine
+   → Contrairement au chiffrement qui est RÉVERSIBLE
+
+🔹 Analogies du hashage :
+
+   🥩 Hachage de viande :
+      → Viande entière → hachoir → petits morceaux
+      → Petits morceaux → impossible → viande entière
+
+   📄 Destructeur de papier :
+      → Document complet → destructeur → confettis
+      → Confettis → impossible → document original
+
+🔹 Commande :
+    Switch(config)# enable secret MOT_DE_PASSE
+
+🔹 Exemple :
+    Switch(config)# enable secret cisco
+
+🔹 Résultat dans running-config :
+    enable secret 5 $1$mERr$hx5rVt7rPNoS4wqbXKX7m0
+                  ↑
+                  Algorithme MD5 (type 5)
+
+🔹 Algorithme utilisé :
+   → Type 5 (MD5) - Le plus célèbre au monde
+   → ⚠️ Aujourd'hui considéré comme faible (mais mieux que type 7)
+
+----------------------------------------------
+⚔️ enable password vs enable secret
+----------------------------------------------
+
+🔹 Règle d'or :
+   → Si les DEUX sont configurés, enable secret PRIME sur enable password
+   → enable password n'est utilisé que si enable secret n'existe pas
+
+
+----------------------------------------------
+♻️ COMMANDE INVERSE : no
+----------------------------------------------
+
+🔹 Astuce importante :
+   → Pour retirer/annuler une commande, on met no devant
+
+🔹 Exemples :
+    Switch(config)# no enable password
+    Switch(config)# no enable secret
+    Switch(config)# no service password encryption
+
+🔹 Utilité :
+   → Supprimer une configuration existante
+   → Désactiver une fonctionnalité
+   → Revenir à l'état par défaut
+
+----------------------------------------------
+⚠️ LIMITES ET ATTAQUES
+----------------------------------------------
+
+🔹 Même le hashage peut être vulnérable :
+
+   1. Attaque par dictionnaire :
+      → On teste TOUS les mots du dictionnaire
+      → Chaque mot est hashé et comparé
+      → Si le mot de passe est un mot courant → trouvé !
+
+   2. Attaque par brute force :
+      → On teste TOUTES les combinaisons possibles
+      → Très long, mais puissant
+
+   3. Sites de crack (ex: ifm.net) :
+      → Base de données de hashs pré-calculés
+      → Permet de retrouver des mots de passe faibles
+
+----------------------------------------------
+📋 COMMANDES À RETENIR
+----------------------------------------------
+
+   | Commande                               | Utilité                                    |
+   |----------------------------------------|--------------------------------------------|
+   | enable password MDP                    | Mot de passe (chiffré type 7) - FAIBLE    |
+   | enable secret MDP                      | Mot de passe (hashé type 5/MD5) - MEILLEUR|
+   | service password encryption            | Chiffre les mots de passe en clair         |
+   | no enable password                     | Supprime le mot de passe                   |
+   | no enable secret                       | Supprime le secret                         |
+   | no service password encryption         | Désactive le chiffrement                   |
+
+----------------------------------------------
+📌 À RETENIR 
+----------------------------------------------
+
+1️⃣ enable password = FAIBLE (type 7, réversible)
+   enable secret = FORT (type 5/MD5, non réversible)
+
+2️⃣ service password encryption → chiffre enable password (mais reste faible)
+
+3️⃣ Si enable secret ET enable password existent → enable secret est utilisé
+
+4️⃣ no + commande = annuler/supprimer la configuration
+
+5️⃣ Le hashage est irréversible, contrairement au chiffrement
+
+6️⃣ MD5 (type 5) est mieux que type 7, mais aujourd'hui considéré comme faible
