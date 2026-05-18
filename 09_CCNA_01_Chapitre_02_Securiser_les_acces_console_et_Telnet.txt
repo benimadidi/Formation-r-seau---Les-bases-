@@ -1,0 +1,231 @@
+
+===================================================================
+    🔒 SÉCURISER LES ACCÈS CONSOLE ET TELNET(CCNA 1 - Chapitre 2)
+===================================================================
+
+🔹 Objectif :
+   → Protéger les différents accès à l'équipement
+   → Console (accès physique direct)
+   → Telnet (accès à distance via réseau)
+
+----------------------------------------------
+📢 BANNIÈRE (MOTD - Message Of The Day)
+----------------------------------------------
+
+🔹 Utilité :
+   → Message affiché AVANT l'authentification
+   → Alerte l'utilisateur sur les règles d'utilisation
+
+🔹 Pourquoi c'est IMPORTANT :
+   → Identifie l'équipement (switch, routeur, entreprise)
+   → Avertit que les accès sont contrôlés et enregistrés (LOGS)
+   → Mentionne que les accès non autorisés feront l'objet de poursuites
+   → Protège l'entreprise légalement
+
+🔹 Aspect juridique :
+   → Le message doit être affiché pour maximiser les chances
+     de gagner une affaire judiciaire
+   → Prouve que l'utilisateur a été averti avant l'accès
+
+🔹 Commande (depuis config globale) :
+    banner motd "Le message d'avertissement"
+
+🔹 Résultat à la connexion (avant login) :
+    ATTENTION : Acces reserve au personnel autorise. Toute connexion non autorisee fera l'objet de poursuites.
+    User Access Verification
+    Password:
+
+----------------------------------------------
+🎮 SÉCURISATION DE L'ACCÈS CONSOLE
+----------------------------------------------
+
+🔹 Principe :
+   → Accès PHYSIQUE (câble console direct)
+   → On configure la LIGNE console
+
+🔹 Commande pour accéder à la ligne console :
+    line console 0
+
+🔹 Pourquoi le "0" ?
+   → ID de la ligne console
+   → Il n'y en a qu'UNE seule, donc toujours 0
+
+🔹 Configuration (2 étapes) :
+
+   1️⃣ Définir le mot de passe :
+      password MonMotDePasse
+
+   2️⃣ Définir la méthode d'authentification :
+      login
+      (demande le mot de passe à la connexion)
+
+🔹 Exemple complet :
+    Switch(config)# line console 0
+    Switch(config-line)# password cisco123
+    Switch(config-line)# login
+    Switch(config-line)# exit
+
+----------------------------------------------
+🌐 ACCÈS À DISTANCE (TELNET / VTY)
+----------------------------------------------
+
+🔹 VTY (Virtual Teletype) :
+   → Lignes virtuelles pour les connexions à distance
+   → Telnet ou SSH utilisent ces lignes
+
+🔹 Par défaut :
+   → 16 lignes VTY (0 à 15)
+   → Permet 16 connexions simultanées
+
+🔹 Commande :
+   - line vty 0 15
+
+🔹 Configuration (identique à console) :
+   - line vty 0 15
+   - password cisco123
+   - login
+   - exit
+
+🔹 ⚠️ ATTENTION :
+   → L'accès à distance (Telnet) nécessite enable secret
+   → Sinon, impossible de passer en mode privilégié
+
+🔹 Récapitulatif des lignes :
+
+   | Type      | Commande          | Accès             | Nombre     |
+   |-----------|-------------------|-------------------|------------|
+   | Console   | line console 0    | Physique (câble)  | 1 seule    |
+   | VTY       | line vty 0 15     | Réseau (Telnet)   | 16 max     |
+
+----------------------------------------------
+🔧 CONFIGURATION RÉSEAU PRÉALABLE (pour Telnet)
+----------------------------------------------
+
+🔹 Condition pour Telnet :
+   → L'équipement doit avoir une adresse IP
+   → Le PC et le switch doivent être sur le même réseau
+
+🔹 Concept important : VLAN 1
+   → Tous les ports d'un switch sont connectés à un port VIRTUAL
+   → Ce port virtuel s'appelle VLAN 1
+   → C'est par lui que passe la communication IP
+
+🔹 Schéma :
+    [Port physique 1] ──┐
+    [Port physique 2] ──┼── [VLAN 1 (interface virtuelle)]
+    [Port physique 3] ──┘
+
+🔹 Pour configurer l'adresse IP du switch :
+    - interface vlan 1
+
+🔹 Commandes :
+    - interface vlan 1
+    - ip address 192.168.1.1 255.255.255.0
+    - no shutdown
+    - exit
+
+🔹 Explication de no shutdown :
+   → Active l'interface (allume)
+   → Message : 
+        %LINK-3-UPDOWN: Interface Vlan1, changed state to up
+        %LINEPROTO-5-UPDOWN: Line protocol on Interface Vlan1, changed state to up
+   → Couche 1 (physique) activée
+   → Couche 2 (liaison) activée
+
+----------------------------------------------
+💻 CONFIGURATION IP DU PC (rappel)
+----------------------------------------------
+
+🔹 Pour configurer l'IP sur Windows (parenthèse du cours) :
+
+   → Panneau de configuration
+   → Réseau et Internet
+   → Centre réseau et partage
+   → Cliquer sur le réseau (Ethernet ou Wi-Fi)
+   → Propriétés
+   → Protocole Internet version 4 (TCP/IPv4)
+   → Utiliser l'adresse IP suivante
+
+🔹 Exemple d'IP pour le PC :
+   → Adresse IP : 192.168.1.20
+   → Masque : 255.255.255.0
+   → Passerelle : 192.168.1.1 (si routeur)
+
+🔹 Alternative :
+   → Obtenir automatiquement (via serveur DHCP)
+
+----------------------------------------------
+🔌 TEST DE CONNECTIVITÉ : PING
+----------------------------------------------
+
+🔹 Commande de base :
+    C:\> ping 192.168.1.1
+
+🔹 Résultat : (depuis PC vers switch)
+
+    Réponse de 192.168.1.1: octets=32 temps<1ms TTL=255
+    Réponse de 192.168.1.1: octets=32 temps<1ms TTL=255
+    Réponse de 192.168.1.1: octets=32 temps<1ms TTL=255
+    Réponse de 192.168.1.1: octets=32 temps<1ms TTL=255
+
+    Statistiques Ping pour 192.168.1.1:
+        Paquets : envoyés = 4, reçus = 4, perdus = 0
+
+🔹 Interprétation :
+   → Perte 0% = connectivité OK
+   → Perte 100% = pas de connectivité
+
+----------------------------------------------
+🔌 PROTOCOLE TELNET
+----------------------------------------------
+
+🔹 Définition :
+   → Protocole d'accès à distance (port 23)
+   → Permet de contrôler un équipement via le réseau
+
+🔹 Depuis PC (invité de commandes) :
+    C:\> telnet 192.168.1.1
+
+🔹 Séquence de connexion Telnet :
+    1. Connexion réseau établie
+    2. Affichage de la bannière MOTD
+    3. Mot de passe VTY demandé
+    4. Mode utilisateur (>)
+    5. enable + enable secret pour passer en mode privilégié
+
+----------------------------------------------
+📋 COMMANDES RÉCAPITULATIVES
+----------------------------------------------
+
+   | Commande                                    | Utilité                           |
+   |---------------------------------------------|-----------------------------------|
+   | banner motd "message"                       | Affiche une bannière avant login  |
+   | line console 0                              | Accès à la ligne console          |
+   | password MDP                                | Définit un mot de passe           |
+   | login                                       | Active la demande de mot de passe |
+   | line vty 0 15                               | Accès aux lignes Telnet/SSH       |
+   | interface vlan 1                            | Accès à l'interface virtuelle     |
+   | ip address IP MASQUE                        | Donne une adresse IP au switch    |
+   | no shutdown                                 | Active l'interface                |
+   | ping IP                                     | Teste la connectivité             |
+   | telnet IP                                   | Se connecter à distance (depuis PC)|
+
+----------------------------------------------
+📌 À RETENIR
+----------------------------------------------
+
+1️⃣ Banner motd → Message d'avertissement AVANT login (important pour le juridique)
+
+2️⃣ line console 0 → Configure l'accès physique (1 seul accès)
+
+3️⃣ line vty 0 15 → Configure l'accès distant (16 accès max)
+
+4️⃣ Pour Telnet, il faut :
+   → IP sur le switch (interface vlan 1)
+   → IP sur le PC (même réseau)
+   → no shutdown sur l'interface vlan 1
+   → enable secret configuré
+
+5️⃣ ping → Test de connectivité (taux de perte = 0% pour OK)
+
+6️⃣ Telnet = protocole d'accès distant (port 23, non sécurisé)
