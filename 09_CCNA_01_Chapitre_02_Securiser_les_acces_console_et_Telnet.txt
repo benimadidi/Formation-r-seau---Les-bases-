@@ -225,7 +225,8 @@
    → IP sur le PC (même réseau)
    → no shutdown sur l'interface vlan 1
    → enable secret configuré
-
-5️⃣ ping → Test de connectivité (taux de perte = 0% pour OK)
+'
+5️⃣ ping → Test de connectivité (taux de perte = 0% pour OK)'
+    La commande ctrl + maj + 6 : permet d'interrompre le processus d'un ping
 
 6️⃣ Telnet = protocole d'accès distant (port 23, non sécurisé)
