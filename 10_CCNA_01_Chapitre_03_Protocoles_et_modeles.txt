@@ -1,0 +1,131 @@
+
+========================================================
+    📡 PROTOCOLES ET MODÈLES (CCNA 1 - Chapitre 3)
+========================================================
+
+🔹 Chapitre introductif.
+   → Comment organiser l’acheminement des données dans un réseau.
+   → Terminologie : bit, trame (frame), paquet (packet), segment, donnée (data).
+   → Découvrir les couches et les règles de communication.
+
+
+----------------------------------------------
+📌 SOMMAIRE DU CHAPITRE
+----------------------------------------------
+
+1.  Règles de communication (3 éléments fondamentaux)
+2.  Protocoles (définition, nécessité, fonctionnement)
+3.  Suite de protocoles (TCP/IP)
+4.  Organismes de normalisation (ISO, IEEE, IETF...)
+5.  Modèles de référence (OSI vs TCP/IP)
+6.  Encapsulation / Décapsulation
+7.  Options de diffusion : UNICAST, BROADCAST, MULTICAST
+
+
+----------------------------------------------
+🧠 1. RÈGLES DE COMMUNICATION (3 ÉLÉMENTS)
+----------------------------------------------
+
+🔹 3 composants fondamentaux d’une communication:
+   → Source (émetteur, expéditeur) : celui qui envoie le message.
+   → Destination (récepteur) : celui qui reçoit et interprète le message.
+   → Canal (medium, support) : voie physique (ou logique) par laquelle le message se déplace (câble, fibre, ondes radio).
+
+🔹 Pourquoi des règles ?
+   → Ne suffit pas de connecter physiquement : les périphériques doivent savoir comment communiquer.
+   → Les règles d’un appel téléphonique ne sont pas les mêmes que celles d’une lettre.
+   → En réseau, ces règles s’appellent des **protocoles**.
+
+Exemple simplifié (CCNA) :
+   [Source] ──── message ────→ [Canal] ──── message ────→ [Destination]
+
+
+----------------------------------------------
+📜 2. PROTOCOLES (RÈGLES TECHNIQUES)
+----------------------------------------------
+
+🔹 Définition :
+   → Ensemble de règles convenues à l’avance.
+   → Permet à deux ou plusieurs entités de communiquer efficacement.
+
+🔹 Un protocole définit généralement:
+   – Émetteur / récepteur identifiés.
+   – Langage commun (format, syntaxe, encodage).
+   – Vitesse et timing (rythme, accusés de réception).
+   – Options de remise du message (à 1, à plusieurs ou à tous).
+
+🔹 Exemples concrets :
+   → HTTP/HTTPS : navigation web.
+   → TCP : fiabilité, réorganisation des données.
+   → IP : adressage et routage.
+   → Ethernet : accès au support (couche liaison).
+
+🔹 Encodage (message → bits → signaux):
+   → Conversion des données en bits.
+   → Chaque bit est encodé en impulsion électrique, onde lumineuse ou onde radio selon le médium.
+   → La destination reçoit le signal et le décode.
+
+🔹 Formatage et encapsulation:
+   → Analogie : mettre une lettre dans une enveloppe.
+   → Chaque message informatique est encapsulé dans une **trame** (frame) avant d’être envoyé.
+   → La trame contient : adresse destination, adresse source, données utiles, contrôle.
+
+🔹 Taille du message:
+   → Les messages longs sont découpés en petits morceaux (paquets).
+   → Évite de monopoliser le canal.
+   → Permet le multiplexage.
+
+💡 À retenir pour :
+   HTTP        → gère l’interaction client/serveur web.
+   TCP         → gère la conversation individuelle entre serveur et client.
+   IP          → responsable de la livraison via le meilleur chemin.
+
+
+----------------------------------------------
+📚 3. SUITE DE PROTOCOLES (PROTOCOL SUITE)
+----------------------------------------------
+
+🔹 Définition :
+   → Un ensemble de protocoles qui travaillent ensemble.
+   → Exemple : la suite TCP/IP.
+
+🔹 Pourquoi une suite ?
+   → Un seul protocole ne peut pas tout faire (adressage, fiabilité, routage, application...).
+   → Chaque protocole gère un aspect spécifique.
+   → Ils s’empilent en couches : **modèle en couches**.
+
+🔹 Avantages des couches :
+   – Interopérabilité.
+   – Standardisation.
+   – Modularité (on peut changer un protocole sans tout refaire).
+
+
+----------------------------------------------
+🏛️ 4. ORGANISMES DE NORMALISATION
+----------------------------------------------
+
+🔹 Rôle :
+   → Définir des standards pour que les équipements de fabricants différents puissent communiquer (interopérabilité).
+
+Principaux organismes:
+
+   | Sigle | Nom complet                          | Rôle principal                          |
+   |-------|--------------------------------------|------------------------------------------|
+   | ISO   | Organisation internationale de normalisation | Modèle OSI (7 couches)         |
+   | IEEE  | Institute of Electrical and Electronics Engineers | Normes Ethernet (802.3), Wi-Fi (802.11) |
+   | IETF  | Internet Engineering Task Force      | Protocoles Internet (RFC : TCP, IP, HTTP) |
+   | ITU-T | Union internationale des télécommunications | Normes pour télécoms et WAN       |
+
+💡 Important:
+   – OSI est un modèle (ISO).
+   – TCP/IP est une suite de protocoles (IETF).
+   – Ethernet est une norme (IEEE).
+
+
+----------------------------------------------
+📌 À RETENIR 
+----------------------------------------------
+
+1. La communication réseau repose sur 3 éléments : source, destination, canal.
+2. Un protocole est un ensemble de règles qui régissent la transmission.
+3. Les organismes de normalisation (IEEE, IETF, ISO, ITU-T) garantissent l’interopérabilité.
