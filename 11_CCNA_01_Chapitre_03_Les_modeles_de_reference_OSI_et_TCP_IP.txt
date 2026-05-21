@@ -1,0 +1,211 @@
+======================================================================
+    📐 LES MODÈLES DE RÉFÉRENCE OSI ET TCP/IP (CCNA 1 - Chapitre 3)
+======================================================================
+
+🔹 Objectif du chapitre :
+   → Comprendre comment sont organisés les protocoles réseau
+   → Découvrir les deux modèles de référence : OSI (7 couches) et TCP/IP (4 couches)
+   → Maîtriser l'encapsulation et la terminologie PDU
+
+----------------------------------------------
+🏗️ POURQUOI DES MODÈLES EN COUCHES ?
+----------------------------------------------
+
+🔹 Analogie des armoires / tiroirs :
+   → Un espace où on range les protocoles par catégorie
+   → Chaque couche a une fonction spécifique
+   → On passe d'un niveau à l'autre (de haut en bas ou bas en haut)
+
+🔹 Pourquoi faire des couches ?
+   → Plus d'organisation dans la gestion du flux de trafic
+   → Plus d'organisation dans la gestion des protocoles
+   → Aide à la CONCEPTION : chaque protocole a des informations définies
+   → Interface claire entre les couches supérieures et inférieures
+
+🔹 Qui a créé ces modèles ?
+   → Organismes de normalisation (ISO, IETF)
+   → Entreprises
+   → Concurrents qui proposent leurs propres modèles
+
+----------------------------------------------
+📊 OSI vs TCP/IP : LES DEUX MODÈLES
+----------------------------------------------
+
+🔹 Modèle OSI (Open Systems Interconnection) :
+   → Proposé par l'ISO (Organisation mondiale de normalisation)
+   → 7 couches (très détaillé)
+   → Modèle THÉORIQUE et PÉDAGOGIQUE
+
+🔹 Modèle TCP/IP (Transmission Control Protocol/Internet Protocol) :
+   → 4 couches (plus simple et plus rapide)
+   → Modèle IMPLÉMENTÉ sur Internet
+   → C'est le modèle utilisé dans les entreprises
+
+🔹 Quelle est la relation entre les deux ?
+   → TCP/IP n'a rien supprimé, il a GROUPÉ des éléments
+   → Les 4 couches TCP/IP correspondent aux 7 couches OSI
+   → OSI = utilisé pour les cours, la théorie, plus de détails
+   → TCP/IP = implémenté, utilisé en pratique
+
+🔹 Tableau comparatif :
+
+   | OSI (7 couches)        | TCP/IP (4 couches)     |
+   |------------------------|------------------------|
+   | 7 - Application        |                        |
+   | 6 - Présentation       | 4 - Application        |
+   | 5 - Session            |                        |
+   | 4 - Transport          | 3 - Transport          |
+   | 3 - Réseau             | 2 - Internet           |
+   | 2 - Liaison de données |                        |
+   |                        | 1 - Accès réseau       |
+   | 1 - Physique           |                        |
+
+💡 À retenir :
+   → OSI = modèle théorique (cours, certifications)
+   → TCP/IP = modèle réellement utilisé sur Internet
+
+----------------------------------------------
+🔢 LES 7 COUCHES DU MODÈLE OSI (vue d'ensemble)
+----------------------------------------------
+
+🔹 Numérotation : toujours de bas en haut !
+   → Couche 1 = physique (la plus basse)
+   → Couche 7 = application (la plus haute)
+
+🔹 Les 7 couches avec leur rôle principal :
+
+   ═══════════════════════════════════════════════════════
+   7 - APPLICATION (Application)
+   → Interface avec l'utilisateur et les applications
+   → Où on génère la requête (page web, email, etc.)
+   → Protocoles : HTTP, HTTPS, FTP, SMTP, DNS
+   ═══════════════════════════════════════════════════════
+
+   6 - PRÉSENTATION (Presentation)
+   → Met en forme l'information pour le réseau
+   → 3 fonctions principales :
+        • CODAGE : adaptation au format de transmission
+        • CHIFFREMENT : sécurisation des données
+        • COMPRESSION : réduction de la taille des données
+   → Exemple : conversion JPEG, MPEG, SSL/TLS
+   ═══════════════════════════════════════════════════════
+
+   5 - SESSION (Session)
+   → Établit, maintient et termine la session avec le destinataire
+   → Vérifie que le destinataire est là avant d'envoyer
+   → Gère le dialogue (simplex, half-duplex, full-duplex)
+   → Checkpoints pour reprise après panne [citation:9]
+   ═══════════════════════════════════════════════════════
+
+   📌 Couches 5, 6 et 7 = "Upper Layers" ou couches applicatives
+   → Purement logicielles, dans le PC
+   → Leur PDU s'appelle DONNÉE (Data)
+
+   ═══════════════════════════════════════════════════════
+   4 - TRANSPORT (Transport)
+   → Organise le flux de données
+   → Segmentation des données
+   → Fiabilité (TCP) ou rapidité (UDP)
+   → Contrôle de flux et correction d'erreurs
+   → Son PDU s'appelle SEGMENT (ou datagram pour UDP)
+   → Protocoles : TCP, UDP
+   ═══════════════════════════════════════════════════════
+
+   3 - RÉSEAU (Network)
+   → Adressage LOGIQUE (adresses IP)
+   → Routage : trouver le meilleur chemin
+   → Son PDU s'appelle PAQUET (Packet)
+   → Protocole : IP (Internet Protocol)
+   ═══════════════════════════════════════════════════════
+
+   2 - LIAISON DE DONNÉES (Data Link)
+   → Adressage PHYSIQUE (adresses MAC)
+   → Regroupe les bits en trames (frames)
+   → Détection (mais pas correction) des erreurs
+   → Son PDU s'appelle TRAME (Frame)
+   → Protocoles : Ethernet, PPP, Wi-Fi (802.11)
+   ═══════════════════════════════════════════════════════
+
+   1 - PHYSIQUE (Physical)
+   → Conversion des données en SIGNAL physique
+   → Bits (0 et 1) qui circulent sur le support
+   → Définit : tension, fréquence, type de câble, connecteurs
+   → Son PDU s'appelle BIT
+   ═══════════════════════════════════════════════════════
+
+🔹 Importance des couches 3 et 4 :
+   → Ce sont les plus importantes du réseau
+   → C'est pourquoi on parle de "modèle TCP/IP"
+   → Couche 3 = IP (Internet Protocol)
+   → Couche 4 = TCP (Transmission Control Protocol)
+
+----------------------------------------------
+📦 ENCAPSULATION / DÉCAPSULATION
+----------------------------------------------
+
+🔹 Définition de l'encapsulation :
+   → Processus d'AJOUT d'informations (en-têtes) à mesure que
+     les données descendent les couches (de la 7 vers la 1) [citation:1][citation:8]
+
+🔹 Définition de la décapsulation :
+   → Processus inverse : RETRAIT des en-têtes à mesure que
+     les données remontent les couches (de la 1 vers la 7) [citation:1]
+
+🔹 Pourquoi ajoute-t-on des en-têtes ?
+   → Chaque en-tête contient le protocole choisi pour cette couche
+   → Exemple : en-tête TCP (couche 4) = port source/destination
+   → Exemple : en-tête IP (couche 3) = adresses IP source/destination
+   → Exemple : en-tête Ethernet (couche 2) = adresses MAC [citation:4]
+
+----------------------------------------------
+📝 PROTOCOL DATA UNIT (PDU)
+----------------------------------------------
+
+🔹 Définition (officielle CCNA) :
+   → PDU = Protocol Data Unit
+   → C'est le nom donné aux données à chaque couche du modèle OSI [citation:1]
+
+🔹 En français :
+   → "Unité de données de protocole"
+   → C'est l'ensemble : l'en-tête + les données reçues de la couche supérieure
+
+🔹 Les 5 noms de PDU à connaître PAR CŒUR  :
+
+   | Couche OSI | Nom du PDU            | Explication                          |
+   |------------|-----------------------|--------------------------------------|
+   | 7,6,5      | DONNÉES (Data)        | Message utilisateur pur              |
+   | 4          | SEGMENT (ou Datagram) | Découpage + en-tête TCP/UDP          |
+   | 3          | PAQUET (Packet)       | Ajout adresses IP                    |
+   | 2          | TRAME (Frame)         | Ajout adresses MAC + FCS             |
+   | 1          | BIT (Bit)             | Signal électrique/lumineux/radio     |
+
+📌 À retenir ABSOLUMENT :
+   → Segment = Couche 4 (Transport)
+   → Paquet / Packet = Couche 3 (Réseau)
+   → Trame / Frame = Couche 2 (Liaison de données)
+   → Bit = Couche 1 (Physique)
+
+🔹 Une précision importante :
+   → En réalité, ce sont toujours des bits (des 0 et des 1)
+   → On change juste de NOM selon la couche qu'on analyse [citation:5]
+   → C'est une convention pour faciliter la compréhension
+
+----------------------------------------------
+📌 RÉSUMÉ 
+----------------------------------------------
+
+1️⃣ Pourquoi des couches ?
+   → Organisation, conception modulaire, interopérabilité
+
+2️⃣ OSI = 7 couches (théorique, pédagogique)
+   TCP/IP = 4 couches (implémenté sur Internet)
+
+3️⃣ Ordre des couches OSI (du bas vers le haut) :
+   → Physique - Liaison - Réseau - Transport - Session - Présentation - Application
+   Mnémotechnique : "Pour Laver Ton T-Shirt Sale, Prends de l'Ariel"
+
+4️⃣ PDU à connaître :
+   → Données (Haut) → Segment → Paquet → Trame → Bits (Bas)
+
+5️⃣ Encapsulation = ajout d'en-têtes (descente des couches)
+   Décapsulation = retrait des en-têtes (remontée des couches)
