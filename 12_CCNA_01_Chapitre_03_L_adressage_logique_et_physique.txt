@@ -1,0 +1,105 @@
+============================================================
+    📍 ADRESSAGE LOGIQUE ET PHYSIQUE (CCNA 1 - Chapitre 3)
+============================================================
+
+🔹 Rappel :
+   → Modèle OSI = 7 couches
+   → Deux types d'adressages sont essentiels :
+        • Adressage LOGIQUE (Couche 3 - Réseau)
+        • Adressage PHYSIQUE (Couche 2 - Liaison de données)
+
+----------------------------------------------
+🌍 ADRESSAGE LOGIQUE (IP - Internet Protocol)
+----------------------------------------------
+
+🔹 Définition :
+   → Identifie la source et la destination FINALE sur le réseau global.
+   → C'est l'adresse de l'IMMEUBLE ou de la VILLE.
+
+🔹 Caractéristiques :
+   → Couche 3 (Réseau) du modèle OSI
+   → Protocole : IP (IPv4 ou IPv6)
+   → Inclus dans l'en-tête de la couche réseau
+   → Format : 192.168.1.10 (IPv4) ou 2001:db8::1 (IPv6)
+
+🔹 Rôle :
+   → Permet le routage à travers Internet
+   → Valable sur l'ensemble du réseau (global)
+   → Peut changer (attribuée dynamiquement par DHCP)
+
+🔹 Analogie :
+   → Adresse logique = adresse postale complète (ville, rue, numéro)
+   → Le facteur peut livrer n'importe où dans le monde
+
+🔹 Dans l'en-tête IP (couche 3) :
+   ┌─────────────────────────────────────────────┐
+   │ En-tête IP                                  │
+   ├─────────────────────────────────────────────┤
+   │ Adresse IP source    : 192.168.1.10         │
+   │ Adresse IP destination : 209.85.224.100     │
+   │ (Google)                                    │
+   └─────────────────────────────────────────────┘
+
+----------------------------------------------
+🏠 ADRESSAGE PHYSIQUE (MAC - Media Access Control)
+----------------------------------------------
+
+🔹 Définition :
+   → Identifie de façon UNIQUE un périphérique sur son réseau local.
+   → C'est le NOM ou la PIÈCE D'IDENTITÉ de la personne.
+
+🔹 Caractéristiques :
+   → Couche 2 (Liaison de données) du modèle OSI
+   → Protocole : Ethernet (ou Wi-Fi)
+   → Inclus dans l'en-tête de la couche liaison (trame)
+   → Format : AA:BB:CC:DD:EE:FF (6 octets hexadécimaux)
+
+🔹 Rôle :
+   → Permet l'acheminement PHYSIQUE au sein d'un même LAN
+   → Identifie l'entité exacte (le PC, l'imprimante)
+   → Ne change JAMAIS (gravée dans la carte réseau)
+
+🔹 Analogie (suite de l'exemple de la poste) :
+   → Adresse physique = nom et prénom du destinataire
+   → Dans un immeuble, le facteur a besoin du NOM pour remettre la lettre
+
+🔹 Dans l'en-tête Ethernet (couche 2) :
+   ┌──────────────────────────────────────────────────┐
+   │ En-tête Ethernet (trame)                         │
+   ├──────────────────────────────────────────────────┤
+   │ Adresse MAC source    : AA:BB:CC:11:22:33        │
+   │ Adresse MAC destination : 00:11:22:33:44:55      │
+   └──────────────────────────────────────────────────┘
+
+----------------------------------------------
+🔄 DIFFÉRENCES FONDAMENTALES (TABLEAU)
+----------------------------------------------
+
+   | Critère               | Adresse LOGIQUE (IP)          | Adresse PHYSIQUE (MAC)        |
+   |-----------------------|-------------------------------|-------------------------------|
+   | Couche OSI            | 3 - Réseau                    | 2 - Liaison de données        |
+   | Protocole             | IP (IPv4 / IPv6)              | Ethernet, 802.11 (Wi-Fi)      |
+   | Taille                | 32 bits (IPv4) / 128 bits     | 48 bits (6 octets hexa)       |
+   | Format                | 192.168.1.1                   | AA:BB:CC:DD:EE:FF             |
+   | Portée                | Globale (Internet)            | Locale (LAN uniquement)       |
+   | Modification          | Peut changer (DHCP, statique) | Fixe (gravée dans la carte)   |
+   | Rôle principal        | Routage (trouver le chemin)   | Livraison physique dans le LAN|
+   | Analogie              | Adresse postale (immeuble)    | Nom de la personne            |
+   | Franchit un routeur ? | OUI (inchangée)               | NON (changée à chaque saut)   |
+
+----------------------------------------------
+📌 RÈGLE D'OR 
+----------------------------------------------
+
+   → Les adresses MAC ne traversent JAMAIS un routeur.
+   → Elles sont modifiées à chaque saut (hop) par le routeur.
+   → Seule l'adresse IP (logique) reste inchangée de la source à la destination finale.
+
+----------------------------------------------
+📌 À RETENIR 
+----------------------------------------------
+
+1️⃣ Adresse LOGIQUE (IP) = Couche 3 = identifie l'hôte sur le réseau global (immeuble)
+2️⃣ Adresse PHYSIQUE (MAC) = Couche 2 = identifie l'interface sur le LAN (personne)
+3️⃣ Un routeur arrête la propagation des MAC : la trame est détruite et recréée à chaque saut.
+4️⃣ L'adresse IP peut changer, l'adresse MAC est fixe (sauf usurpation).
