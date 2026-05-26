@@ -1,0 +1,220 @@
+
+====================================================================
+    🔬 LAB - CONFIGURATION DE BASE ET AVANCEE(CCNA 1 - Chapitre 3)
+====================================================================
+
+🔹 Objectif du LAB :
+   → Comprendre les bases de l'adressage IP
+   → Différencier switch (couche 2) et routeur (couche 3)
+   → Configurer des adresses IP sur PC, switch et routeur
+   → Découvrir la table de routage et le routage statique
+
+----------------------------------------------
+🌐 QU'EST-CE QU'UNE ADRESSE IP ? (RAPPEL SIMPLE)
+----------------------------------------------
+
+🔹 Définition simple :
+   → Une adresse IP s'écrit sur 4 cases séparées par des points
+   → Format : [0-255].[0-255].[0-255].[0-255]
+
+🔹 Règle fondamentale :
+   → Chaque case contient un nombre entre 0 et 255
+   → Exemple valide : 192.168.1.1
+   → Exemple invalide : 192.168.1.256 ← 256 est trop grand !
+
+🔹 Structure d'une adresse IP (2 parties) :
+
+   ┌─────────────────────────────────────────────────────────┐
+   │   192 . 168 . 1   │   1                                 │
+   │   ← PARTIE RÉSEAU →   ← PARTIE HÔTE →                   │
+   │   (identifie le LAN)  (identifie la machine)            │
+   └─────────────────────────────────────────────────────────┘
+
+🔹 Règle d'or :
+   → Deux machines dans le MÊME réseau local ont la MÊME partie réseau
+   → Elles ne diffèrent que par la partie hôte
+
+🔹 Exemple concret :
+   → Machine 1 : 192.168.1.1
+   → Machine 2 : 192.168.1.2
+   → Machine 3 : 192.168.1.3
+   → Toutes sont dans le même réseau (192.168.1.0)
+
+🔹 Convention importante :
+   → L'adresse 192.168.1.254 est souvent réservée au ROUTEUR
+   → L'adresse 192.168.1.255 = adresse de broadcast (on n'y touche pas)
+   → L'adresse 192.168.1.0 = adresse du réseau (on ne l'utilise pas pour une machine)
+
+----------------------------------------------
+🔄 SWITCH vs ROUTEUR : RAPPEL SIMPLE
+----------------------------------------------
+
+🔹 Switch (commutateur) :
+   → Sert à BRANCHER des machines ENTRE ELLES
+   → Fonctionne au niveau COUCHE 2 (adresses MAC)
+   → On ne lui donne PAS d'adresse IP (pas nécessaire pour son fonctionnement)
+   → Il fait simplement "tourner" le trafic dans le LAN
+
+🔹 Routeur :
+   → Sert à BRANCHER des RÉSEAUX DIFFÉRENTS
+   → Fonctionne au niveau COUCHE 3 (adresses IP)
+   → Chaque interface du routeur constitue un RÉSEAU différent
+   → On lui DONNE une adresse IP sur chaque interface
+
+🔹 Pourquoi le switch n'a PAS besoin d'adresse IP ?
+   → Dans un réseau local, les données circulent grâce aux adresses MAC
+   → Le switch lit les adresses MAC et aiguille les trames
+   → Une adresse IP n'est pas nécessaire pour cette tâche
+
+----------------------------------------------
+📊 TABLE DE ROUTAGE (ROUTING TABLE)
+----------------------------------------------
+
+🔹 Définition :
+   → Le routeur possède une base de données SPÉCIALE
+   → Elle s'appelle la TABLE DE ROUTAGE
+   → Elle contient tous les réseaux que le routeur connaît
+
+🔹 À chaque configuration d'interface :
+   → Le réseau correspondant s'ajoute AUTOMATIQUEMENT à la table de routage
+   → C'est ce qu'on appelle une route DIRECTEMENT CONNECTÉE
+
+🔹 Commande pour afficher la table de routage :
+    Router# show ip route
+
+🔹 Exemple de table de routage après configuration des interfaces :
+
+    Router# show ip route
+    Codes: C - connected, S - static, O - OSPF, R - RIP
+    ...
+    C    192.168.1.0/24 is directly connected, GigabitEthernet0/0
+    C    192.168.2.0/24 is directly connected, GigabitEthernet0/1
+
+   → C = Connected (route directement connectée)
+
+🔹 Types de routage (aperçu) :
+   → Routage STATIQUE : on ajoute manuellement des routes
+   → Routage DYNAMIQUE : les routeurs découvrent les routes automatiquement (OSPF, RIP, EIGRP)
+
+----------------------------------------------
+🗺️ ROUTAGE STATIQUE (STATIC ROUTING)
+----------------------------------------------
+
+🔹 Définition :
+   → On indique MANUELLEMENT au routeur les réseaux qu'il ne connaît pas
+   → On lui donne le "chemin" à suivre
+
+🔹 Commande de routage statique :
+    Router(config)# ip route RÉSEAU MASQUE PROCHAIN_SAUT
+
+🔹 Exemple concret :
+    Router(config)# ip route 192.168.2.0 255.255.255.0 192.168.3.2
+
+   → 192.168.2.0 = réseau destination
+   → 255.255.255.0 = masque du réseau destination
+   → 192.168.3.2 = adresse du prochain routeur (next hop)
+
+🔹 Pourquoi a-t-on besoin de routage statique ?
+   → Si le routeur n'a pas de route vers un réseau, il ne peut pas y envoyer de paquets
+   → Les routes directement connectées (C) suffisent pour ses propres réseaux
+   → Pour atteindre d'autres réseaux, il faut des routes statiques ou dynamiques
+
+🔹 Dans la table de routage, une route statique apparaît avec "S" :
+    Router# show ip route
+    S    192.168.3.0/24 [1/0] via 192.168.2.2
+
+   → S = Static (route statique)
+
+----------------------------------------------
+🚪 PASSERELLE PAR DÉFAUT (DEFAULT GATEWAY)
+----------------------------------------------
+
+🔹 Définition :
+   → Adresse IP du routeur sur le réseau local
+   → C'est par là que passent les paquets destinés à d'autres réseaux
+
+🔹 Le PC ne sait PAS qu'il y a un routeur !
+   → Même si on met l'adresse 192.168.1.254, le PC ne sait pas que c'est un routeur
+   → Il faut lui indiquer explicitement où envoyer les paquets hors réseau
+
+🔹 Configuration (sur PC Windows) :
+   → Dans les propriétés IPv4
+   → Champ "Passerelle par défaut"
+   → Entrer : 192.168.1.254 (l'adresse IP du routeur sur ce réseau)
+
+🔹 Rôle de la passerelle :
+   → Si la destination est sur le MÊME réseau → envoi direct
+   → Si la destination est sur un AUTRE réseau → envoi à la passerelle
+
+----------------------------------------------
+🔄 COMPORTEMENT DU PING (PREMIER PAQUET PERDU)
+----------------------------------------------
+
+🔹 Observation importante :
+   → Le premier ping après configuration échoue SOUVENT
+   → Ce n'est PAS une erreur de configuration !
+
+🔹 Pourquoi ?
+   → Le routeur doit découvrir l'adresse MAC de la destination
+   → Il envoie une requête ARP (broadcast)
+   → Pendant ce temps, le premier paquet ICMP est perdu (timeout)
+   → Les paquets suivants fonctionnent normalement
+
+🔹 Exemple :
+    C:\> ping 192.168.2.10
+    Délai d'attente de la demande expiré.    ← 1er paquet perdu (ARP)
+    Réponse de 192.168.2.10: octets=32 temps=1ms TTL=126
+    Réponse de 192.168.2.10: octets=32 temps=1ms TTL=126
+    Réponse de 192.168.2.10: octets=32 temps=1ms TTL=126
+
+🔹 À retenir :
+   → Si seulement le premier ping échoue, c'est NORMAL (délai ARP)
+   → Si tous échouent, c'est une ERREUR de configuration
+
+----------------------------------------------
+🏷️ ADRESSES MAC ET TRAVERSÉE DES ROUTEURS
+----------------------------------------------
+
+🔹 Règle fondamentale (rappel chapitre 3) :
+   → L'adresse MAC change à CHAQUE fois qu'on traverse une interface
+   → L'adresse IP reste la même tout le trajet
+
+🔹 Pourquoi ?
+   → La trame (avec adresses MAC) est DÉTRUITE par le routeur
+   → Le routeur recrée une NOUVELLE trame avec :
+        • MAC source = son interface de sortie
+        • MAC destination = le prochain périphérique
+   → L'adresse IP reste inchangée dans le paquet
+
+----------------------------------------------
+📋 COMMANDES RÉCAPITULATIVES
+----------------------------------------------
+
+   | Commande                                   | Utilité                                    |
+   |--------------------------------------------|--------------------------------------------|
+   | show ip route                              | Affiche la table de routage                |
+   | ip route RESEAU MASQUE NEXT_HOP            | Ajoute une route statique                  |
+   | no ip route RESEAU MASQUE NEXT_HOP         | Supprime une route statique                |
+   | show running-config \| include ip route    | Affiche les routes statiques configurées   |
+
+----------------------------------------------
+📌 À RETENIR 
+----------------------------------------------
+
+1️⃣ Adresse IP = 4 cases [0-255] (partie réseau + partie hôte)
+
+2️⃣ Switch = Couche 2 → Pas besoin d'adresse IP
+
+3️⃣ Routeur = Couche 3 → Adresse IP sur chaque interface
+
+4️⃣ Table de routage = base de données des réseaux connus (show ip route)
+
+5️⃣ Routes directement connectées (C) = ajoutées automatiquement
+
+6️⃣ Routes statiques (S) = ajoutées manuellement avec ip route
+
+7️⃣ Passerelle par défaut = adresse IP du routeur sur le LAN (pour les PCs)
+
+8️⃣ Premier ping perdu = normal (temps ARP)
+
+9️⃣ Les adresses MAC changent à chaque traversée de routeur, les IP restent fixes
