@@ -1,0 +1,202 @@
+
+==========================================================================
+    🔗 INTRODUCTION À LA COUCHE LIAISON DE DONNÉES (CCNA 1 - Chapitre 6)
+==========================================================================
+
+📋 SOMMAIRE DU CHAPITRE :
+   1. Fonctions de la couche liaison de données
+   2. Les deux sous-couches : LLC et MAC
+   3. Topologies physiques et logiques
+   4. Topologies WAN (point à point, hub-and-spoke, maillé)
+   5. Topologies LAN
+   6. La trame de liaison de données
+
+----------------------------------------------
+🎯 OBJECTIFS DU CHAPITRE
+----------------------------------------------
+
+À la fin de ce chapitre, vous saurez :
+   → Décrire le rôle et les fonctions de la couche liaison de données
+   → Décrire les caractéristiques des méthodes MAC (Media Access Control)
+   → Décrire les caractéristiques et fonctions de la trame de liaison de données
+
+
+----------------------------------------------
+🏗️ 1. RAPPEL : LA COUCHE LIAISON DE DONNÉES (COUCHE 2)
+----------------------------------------------
+
+🔹 Position dans le modèle OSI :
+   → Couche 2 (juste au-dessus de la couche physique)
+   → Interface entre la partie LOGIQUE (couche 3) et la partie PHYSIQUE (couche 1)
+
+🔹 Définition (officielle CCNA) :
+   → La couche liaison de données est responsable des communications
+     entre les cartes d'interface réseau (NIC) et des périphériques finaux
+
+🔹 Rôle principal :
+   → Permettre aux protocoles de couche supérieure (IP) d'accéder au support physique
+   → Encapsuler les paquets de couche 3 (IPv4 et IPv6) dans des TRAMES de couche 2
+
+🔹 Les 4 FONCTIONS PRINCIPALES de la couche 2 :
+
+   ① Encapsulation des paquets IP en trames
+   ② Contrôle d'accès au support (MAC)
+   ③ Détection des erreurs (CRC - Cyclic Redundancy Check)
+   ④ Adressage physique (adresses MAC)
+
+🔹 Ce que la couche 2 fait pendant le processus d'encapsulation (envoi) :
+   → Reçoit les paquets de la couche 3 (IP)
+   → Les interprète et les prépare pour la couche physique
+   → Ajoute son propre en-tête (source/destination MAC)
+   → Ajoute un en-queue (FCS pour détection d'erreurs)
+
+🔹 Ce que la couche 2 fait pendant le processus de décapsulation (réception) :
+   → Reçoit la trame de la couche physique
+   → Vérifie l'intégrité (CRC)
+   → Retire l'en-tête et l'en-queue de couche 2
+   → Transmet le paquet IP à la couche 3
+
+🔹 Transmission de segment en segment :
+   → La couche 2 décapsule la trame arrivante
+   → Retire l'ancien protocole de couche 2
+   → Ré-encapsule le paquet dans une NOUVELLE trame adaptée au prochain support
+   → Transmet la nouvelle trame sur le segment suivant
+
+🔹 La couche 2 sur le réseau :
+   → Ethernet = nom du protocole de couche 2 le plus répandu pour les LAN
+
+
+----------------------------------------------
+🔬 2. LES DEUX SOUS-COUCHES : LLC et MAC
+----------------------------------------------
+
+🔹 La couche liaison de données est DIVISÉE en 2 sous-couches :
+
+   ┌─────────────────────────────────────────────────────────────┐
+   │                    COUCHE LIAISON DE DONNÉES                │
+   ├─────────────────────────────────────────────────────────────┤
+   │  LLC (Logical Link Control) - Partie LOGIQUE et INTELLIGENTE│
+   │  → Récupère les infos de la couche 3 (IP)                   │
+   │  → Assure la communication avec la couche réseau            │
+   │  → Indépendant du support physique                          │
+   ├─────────────────────────────────────────────────────────────┤
+   │  MAC (Media Access Control) - Partie PHYSIQUE               │
+   │  → Assure l'ADRESSAGE PHYSIQUE (adresses MAC)               │
+   │  → Gère l'accès au support (média)                          │
+   │  → Dépendant du support (Ethernet, Wi-Fi, etc.)             │
+   └─────────────────────────────────────────────────────────────┘
+
+🔹 Rôle de la sous-couche LLC (Logical Link Control) :
+   → Fait le lien entre la couche réseau (IP) et la couche liaison
+   → Identifie quel protocole de couche 3 est utilisé (IPv4 ou IPv6)
+   → Permettre à plusieurs protocoles réseau de cohabiter
+
+🔹 Rôle de la sous-couche MAC (Media Access Control) :
+   → Définit les adresses PHYSIQUES (adresses MAC)
+   → Contrôle l'accès au support (qui envoie, quand ?)
+   → C'est POURQUOI on appelle cela "adresse MAC"
+
+🔹 Pourquoi cette séparation ?
+   → LLC = partie commune à tous les supports
+   → MAC = partie spécifique à chaque technologie (Ethernet, Wi-Fi, Token Ring...)
+
+
+----------------------------------------------
+🏛️ 3. ORGANISMES DE NORMALISATION DE LA COUCHE 2
+----------------------------------------------
+
+   | Organisme | Rôle dans la couche 2                          |
+   |-----------|-------------------------------------------------|
+   | IEEE      | Standardise Ethernet (802.3) et Wi-Fi (802.11) |
+   | ANSI      | Normes américaines pour les WAN (FDDI, ATM)    |
+   | ITU-T     | Normes pour les WAN (HDLC, PPP, Frame Relay)   |
+   | ISO       | Modèle OSI (structuration de la couche 2)      |
+
+
+----------------------------------------------
+🗺️ 4. TOPOLOGIES PHYSIQUE vs LOGIQUE
+----------------------------------------------
+
+🔹 Rappel (vu au chapitre 1) :
+
+   TOPOLOGIE PHYSIQUE :
+   → Emplacement PHYSIQUE des dispositifs
+   → Où sont installés les câbles
+   → Où sont branchés les équipements
+   → Exemple : "le switch est dans l'armoire, pièce 204"
+
+   TOPOLOGIE LOGIQUE :
+   → Comment les DONNÉES circulent dans le réseau
+   → Les ports et le système d'adressage
+   → Le CHEMIN que prennent les paquets
+   → Exemple : "les données suivent le chemin A → B → C"
+
+🔹 ÉLÉMENT LE PLUS IMPORTANT de la topologie logique :
+   → COMMENT les données circulent dans le réseau
+   → C'est la VOIE LOGIQUE qu'emprunte l'information
+
+
+----------------------------------------------
+🌍 5. TOPOLOGIES WAN (Réseaux étendus)
+----------------------------------------------
+
+🔹 Les 3 topologies principales pour les WAN :
+
+   ═══════════════════════════════════════════════════════════
+   ① TOPOLOGIE POINT À POINT (Point-to-Point)
+      → 2 sites connectés DIRECTEMENT
+      → Simple, sécurisé, prévisible
+      → Utilisé pour : liaison entre deux bureaux distants
+      
+      Schéma : [Site A] ============= [Site B]
+   ═══════════════════════════════════════════════════════════
+
+   ② TOPOLOGIE HUB-AND-SPOKE (Étoile)
+      → Un site CENTRAL (hub) connecté à plusieurs sites (spokes)
+      → MEILLEUR rapport qualité-prix
+      → Le + utilisé pour les WAN d'entreprise
+      → Inconvénient : si le hub tombe, tout tombe (SPOF !)
+      
+      Schéma :                [Site B]
+                           /
+              [Site A] ---[Hub]--- [Site C]
+                           \
+                            [Site D]
+   ═══════════════════════════════════════════════════════════
+
+   ③ TOPOLOGIE MAILLÉE (Mesh)
+      → TOUT le monde est relié à TOUT le monde
+      → Redondance maximale
+      → Formule : N × (N-1) / 2 (nombre de liens)
+      → LE TOP niveau fiabilité
+      → TRÈS CHER, complexe à maintenir
+      
+      Exemple avec 4 routeurs : 4 × 3 / 2 = 6 liens
+      
+      Schéma :
+              [A] --- [B]
+              | \     / |
+              |  \   /  |
+              |   \/    |
+              |   /\    |
+              |  /  \   |
+              | /    \  |
+              [C] --- [D]
+   ═══════════════════════════════════════════════════════════
+
+
+📌 À retenir : Hub-and-spoke = meilleur rapport qualité/prix
+
+
+----------------------------------------------
+📌 À RETENIR 
+----------------------------------------------
+
+1️⃣ Couche liaison de données = Couche 2 = interface entre logique (IP) et physique
+
+2️⃣ 2 sous-couches : LLC (logique, lien avec IP) et MAC (physique, adressage MAC)
+
+3️⃣ Ethernet = nom du protocole de couche 2 le plus répandu
+
+4️⃣ Topologies WAN : Point à point, Hub-and-spoke (le + courant), Maillée
+   → Formule du maillage : N × (N-1) / 2
