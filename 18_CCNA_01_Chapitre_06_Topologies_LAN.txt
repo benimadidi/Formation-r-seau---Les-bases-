@@ -1,0 +1,234 @@
+
+==============================================
+    🏠 TOPOLOGIES LAN (CCNA 1 - Chapitre 6)
+==============================================
+
+🔹 Suite du chapitre sur la couche liaison de données
+   → Après les topologies WAN (point à point, hub-and-spoke, maillé)
+   → Focus sur les topologies LAN et leur évolution
+
+----------------------------------------------
+🔄 1. LE CONCENTRATEUR (HUB) - ANCIENNE TECHNOLOGIE
+----------------------------------------------
+
+🔹 Caractéristiques du HUB :
+   → AUCUNE intelligence
+   → Se contente de RELIER les utilisateurs entre eux
+   → Fonctionne en HALF DUPLEX (semi-duplex)
+   → Achemine les données en DIFFUSION (broadcast)
+
+🔹 Problème majeur : absence d'intelligence
+   → Si 4 utilisateurs connectés et que l'utilisateur 1 veut envoyer à l'utilisateur 3
+   → Le hub ne sait PAS qui est le destinataire
+   → Il envoie la donnée à TOUS les autres utilisateurs
+
+🔹 Half Duplex (semi-duplex) :
+   → Pendant qu'on envoie, on ne peut PAS recevoir
+   → Comme un talkie-walkie : un seul parle à la fois
+   → Ne peut PAS envoyer à un destinataire spécifique
+
+🔹 Conséquence : les COLLISIONS
+   → Deux PC qui envoient en même temps → collision
+   → Données corrompues, à réémettre
+
+
+----------------------------------------------
+💍 2. SOLUTION : TOKEN RING (ANNEAU À JETON)
+----------------------------------------------
+
+🔹 Principe du système à jeton (Token) :
+   → Un JETON (token) circule dans l'anneau
+   → Seul celui qui possède le jeton peut envoyer des données
+   → Évite les collisions
+
+🔹 Topologie associée : ANNEAU (Ring)
+   → Les appareils sont connectés en cercle
+   → Le jeton passe de machine en machine
+
+🔹 Problème de Token Ring :
+   → Très PEU ÉVOLUTIF
+   → Si un appareil tombe, tout l'anneau tombe
+   → Aujourd'hui presque plus utilisé (remplacé par Ethernet)
+
+🔹 Schéma de l'anneau :
+        [PC1] ─── [PC2]
+         │          │
+        [PC4] ─── [PC3]
+
+
+----------------------------------------------
+🚌 3. SOLUTION : BUS ETHERNET + CSMA/CD
+----------------------------------------------
+
+🔹 Topologie BUS :
+   → Tous les appareils sur le MÊME câble (le bus)
+   → Très simple, économique
+   → Aujourd'hui obsolète
+
+🔹 CSMA/CD (Carrier Sense Multiple Access / Collision Detection) :
+   → Technologie pour gérer les accès au support
+   → Principe : "Écouter avant de parler"
+
+🔹 Fonctionnement du CSMA/CD :
+
+   ÉTAPE 1 : Écouter (Carrier Sense)
+      → Chaque périphérique écoute le câble
+      → S'il est libre → on envoie
+      → S'il est occupé → on attend
+
+   ÉTAPE 2 : Collision détectée (Collision Detection)
+      → Si deux envoient en même temps → collision
+      → Les deux arrêtent d'envoyer
+      → Attendent un temps aléatoire
+      → Puis réessayent
+
+🔹 Problème avec CSMA/CD :
+   → Les collisions existent ENCORE
+   → Cela fonctionne mais avec des pertes
+   → Particulièrement quand le réseau est chargé
+
+🔹 Avantage du CSMA/CD historique :
+   → Permettait de faire fonctionner Ethernet sur des topologies partagées (bus/hub)
+   → Sans CSMA/CD = chaos des collisions
+
+
+----------------------------------------------
+📡 4. CSMA/CA (POUR LE SANS FIL - Wi-Fi)
+----------------------------------------------
+
+🔹 CSMA/CA (Collision Avoidance) :
+   → Technologie utilisée par le Wi-Fi (802.11)
+   → Pas de "Collision Detection" possible en Wi-Fi
+   → On évite la collision AVANT d'envoyer
+
+🔹 Fonctionnement du CSMA/CA :
+
+   ÉTAPE 1 : Écouter (le médium est-il libre ?)
+   ÉTAPE 2 : Attendre un temps aléatoire (backoff)
+   ÉTAPE 3 : Envoyer une REQUÊTE D'ENVOI (RTS - Request To Send)
+   ÉTAPE 4 : Le destinataire répond (CTS - Clear To Send)
+   ÉTAPE 5 : Envoi des données
+   ÉTAPE 6 : Attente d'un accusé de réception (ACK)
+
+🔹 Pourquoi pas de détection de collision en Wi-Fi ?
+   → Un périphérique ne peut pas écouter et émettre en même temps
+   → Les ondes radio peuvent masquer les signaux (problème du "terminal caché")
+
+
+----------------------------------------------
+🎯 5. LA SOLUTION MODERNE : LE COMMUTATEUR (SWITCH)
+----------------------------------------------
+
+🔹 Le Switch = INTELLIGENT contrairement au hub :
+   → Possède une table d'adresses MAC (table CAM)
+   → Apprend quelles MAC sont sur quels ports
+   → Envoie les données UNIQUEMENT au destinataire
+
+🔹 Comment il fonctionne :
+   → PC1 veut envoyer à PC3 : le switch envoie UNIQUEMENT au port de PC3
+   → Pas de diffusion inutile
+   → Sécurité améliorée
+
+🔹 Le FULL DUPLEX (duplex intégral) :
+   → Grâce au switch, on peut envoyer ET recevoir SIMULTANÉMENT
+   → Comme un téléphone : les deux peuvent parler en même temps
+   → La COLLISION N'EXISTE PLUS !
+
+🔹 Comparaison Half Duplex vs Full Duplex :
+
+   | Mode         | Analogie        | Envoi et réception simultanés ? | Collisions ? |
+   |--------------|-----------------|---------------------------------|--------------|
+   | Half Duplex  | Talkie-walkie   | NON (à tour de rôle)            | OUI          |
+   | Full Duplex  | Téléphone       | OUI (en même temps)             | NON          |
+
+🔹 Pourquoi les collisions disparaissent avec le switch ?
+   → Chaque port du switch est un DOMAINE DE COLLISION séparé
+   → Le switch dispose d'une mémoire tampon (buffer)
+   → Les trames sont temporisées et envoyées une par une
+
+🔹 Tableau récapitulatif HUB vs SWITCH :
+
+   | Caractéristique      | HUB                    | SWITCH                     |
+   |----------------------|------------------------|----------------------------|
+   | Intelligence         | AUCUNE                 | OUI (table MAC)            |
+   | Mode de transmission | Half Duplex            | Full Duplex                |
+   | Envoi                | Diffusion (broadcast)  | Unicast (au destinataire)  |
+   | Collisions           | BEAUCOUP               | AUCUNE                     |
+   | Domaine de collision | 1 (tout le monde)      | 1 par port                 |
+
+
+----------------------------------------------
+📋 6. ÉVOLUTION HISTORIQUE DES TOPOLOGIES LAN
+----------------------------------------------
+
+   ÉTAPE 1 : Concentrateur (Hub)
+      → Topologie physique : étoile
+      → Topologie logique : bus
+      → Problème : collisions
+
+   ÉTAPE 2 : Token Ring (Anneau à jeton)
+      → Topologie : anneau logique
+      → Évite les collisions avec un jeton
+      → Problème : peu évolutif
+
+   ÉTAPE 3 : Bus Ethernet + CSMA/CD
+      → Topologie : bus
+      → Gestion des collisions par écoute avant envoi
+      → Problème : collisions encore possibles
+
+   ÉTAPE 4 : Commutateur (Switch) + Full Duplex
+      → Topologie : étoile (physique ET logique)
+      → PAS DE COLLISIONS
+      → Standard actuel
+
+
+----------------------------------------------
+🔧 7. RAPPEL : STRUCTURE DE LA TRAME COUCHE 2
+----------------------------------------------
+
+🔹 La trame de couche liaison de données contient :
+
+   ┌─────────────────────────────────────────────────────────────────┐
+   │                         TRAME COUCHE 2                          │
+   ├─────────────────────────────────────────────────────────────────┤
+   │ EN-TÊTE (HEADER)                                                │
+   │   → Frame Start (délimiteur début de trame)                     │
+   │   → Adresse MAC Source                                          │
+   │   → Adresse MAC Destination                                     │
+   │   → Type (protocole couche 3 encapsulé : IPv4, IPv6)            │
+   │   → Control (service de contrôle de flux)                       │
+   ├─────────────────────────────────────────────────────────────────┤
+   │ DONNÉES                                                         │
+   │   → Le paquet IP (payload)                                      │
+   ├─────────────────────────────────────────────────────────────────┤
+   │ EN-QUEUE (TRAILER)                                              │
+   │   → Frame End (délimiteur fin de trame)                         │
+   │   → CRC (détection d'erreurs)                                   │
+   └─────────────────────────────────────────────────────────────────┘
+
+🔹 Rôle du CRC :
+   → Calculé à l'émission par le périphérique source
+   → Recalculé à la réception par le périphérique destination
+   → Si les deux valeurs ne correspondent pas → trame corrompue
+   → La trame est rejetée
+
+📌 À retenir : le CRC vérifie l'intégrité de la trame mais ne la corrige PAS
+
+
+----------------------------------------------
+📌 À RETENIR 
+----------------------------------------------
+
+1️⃣ HUB = Half Duplex + Diffusion + COLLISIONS
+   → Ne sait pas à qui envoyer, envoie à tout le monde
+
+2️⃣ Token Ring = Anneau + Jeton = évite collisions MAIS peu évolutif
+
+3️⃣ CSMA/CD = "Écouter avant de parler" (Ethernet historique)
+   → Les collisions existent encore mais sont gérées
+
+4️⃣ CSMA/CA = "Éviter la collision AVANT d'envoyer" (Wi-Fi)
+
+5️⃣ SWITCH = Full Duplex + Table MAC + PAS DE COLLISION
+
+6️⃣ Une trame couche 2 = En-tête (MAC src/dest) + Données + En-queue (CRC)
