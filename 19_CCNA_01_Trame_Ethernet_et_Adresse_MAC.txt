@@ -1,0 +1,188 @@
+
+==============================================
+    🔄 COMMUTATION ETHERNET (CCNA 1 - Chapitre 7)
+==============================================
+
+📋 SOMMAIRE DU CHAPITRE :
+   1. Trame Ethernet
+   2. Adresse MAC Ethernet
+   3. Table d'adresses MAC du switch
+   4. Méthodes de transmission et vitesses de commutation
+
+🔹 Rappel du chapitre précédent :
+   → La couche 2 peut fonctionner en LAN comme en WAN
+   → Ethernet = technologie quasi UNIQUE aujourd'hui
+
+----------------------------------------------
+📦 1. TRAME ETHERNET
+----------------------------------------------
+
+🔹 Encapsulation Ethernet :
+   → Fonctionne au niveau de la couche 2 (liaison de données)
+   → Fonctionne également au niveau de la couche 1 (physique)
+
+🔹 Les 2 sous-protocoles Ethernet :
+
+   ═══════════════════════════════════════════════════════════
+   ① IEEE 802.2 (LLC - Logical Link Control)
+      → Sous-couche LOGIQUE de la couche liaison de données
+      → Communique avec les couches supérieures (IP)
+      → Indique quel protocole est encapsulé
+   ═══════════════════════════════════════════════════════════
+
+   ② IEEE 802.3 (MAC - Media Access Control)
+      → Sous-couche PHYSIQUE de la couche liaison de données
+      → Fonctionne avec la couche physique
+      → Gère l'accès au support
+   ═══════════════════════════════════════════════════════════
+
+🔹 Les 2 rôles de la sous-couche MAC :
+
+   ① ENCAPSULATION DES DONNÉES (3 fonctions) :
+      → Préparation de la structure de la trame
+      → Adressage Ethernet (MAC source + MAC destination)
+      → Détection des erreurs (CRC - Cyclic Redundancy Check)
+
+   ② ACCÈS AU SUPPORT (Media Access) :
+      → Définit la méthode d'accès au support physique
+      → CSMA/CD (Ethernet historique) → aujourd'hui OBSOLÈTE
+      → Ethernet 802.3 moderne = mode BIDIRECTIONNEL SIMULTANÉ
+      → Plus de collisions !
+
+🔹 Structure détaillée de la trame Ethernet (sans préambule) :
+
+   ┌─────────────────────────────────────────────────────────────────────────────┐
+   │                            TRAME ETHERNET (IEEE 802.3)                      │
+   ├────────────────┬───────────────┬───────────────┬─────────────┬──────────────┤
+   │ MAC Destination│ MAC Source    │ Type/Length   │ Données     │ FCS (CRC)    │
+   │    6 octets    │   6 octets    │   2 octets    │ 46-1500 o   │  4 octets    │
+   └────────────────┴───────────────┴───────────────┴─────────────┴──────────────┘
+
+   📌 Taille totale = 64 à 1518 octets (hors préambule)
+
+🔹 Détail de chaque champ :
+
+   | Champ            | Taille    | Rôle                                                      |
+   |------------------|-----------|-----------------------------------------------------------|
+   | MAC Destination  | 6 octets  | Adresse MAC du destinataire (qui doit recevoir ?)         |
+   | MAC Source       | 6 octets  | Adresse MAC de l'émetteur (qui a envoyé ?)                |
+   | Type / Length    | 2 octets  | Type de protocole couche 3 encapsulé (IPv4, IPv6, ARP)    |
+   | Données (Payload)| 46-1500 o | Le paquet IP (couche 3)                                   |
+   | FCS (CRC)        | 4 octets  | Détection d'erreurs de transmission                        |
+
+🔹 Taille de la trame :
+   → MINIMUM : 64 octets (pour éviter les collisions)
+   → MAXIMUM : 1518 octets (MTU standard)
+   → En dessous de 64 ou au-dessus de 1518 → trame ABANDONNÉE
+   → Les trames plus grandes (Jumbo Frames) existent mais sont non standard
+
+🔹 Le Préambule (non inclus dans la trame) :
+   → 7 octets (10101010)
+   → Permet la SYNCHRONISATION entre émetteur et récepteur
+   → Non compté dans la taille de la trame
+
+🔹 Le délimiteur de début de trame (SFD) :
+   → 1 octet (10101011)
+   → Indique que la trame va commencer
+
+🔹 Pourquoi ces tailles ?
+   → Minimum 64 octets : pour détecter les collisions sur des réseaux partagés
+   → Maximum 1518 octets : pour ne pas monopoliser le support
+
+----------------------------------------------
+🏷️ 2. ADRESSE MAC ETHERNET
+----------------------------------------------
+
+🔹 Définition :
+   → Adresse physique de la carte réseau (NIC - Network Interface Card)
+   → Identifie de façon UNIQUE un périphérique sur le réseau local
+
+🔹 Caractéristiques :
+   → Écrite sur 48 BITS (6 OCTETS)
+   → Soit 12 valeurs HEXADÉCIMALES
+   → 1 OCTET = 8 BITS = 2 CHIFFRES HEXADÉCIMAUX
+
+🔹 Format d'écriture (plusieurs possibilités) :
+   → Format hexadécimal continu : AA:BB:CC:DD:EE:FF
+   → Format avec tirets : AA-BB-CC-DD-EE-FF
+   → Format Cisco : aabb.ccdd.eeff
+   → Format avec 0x : 0xAA.0xBB.0xCC.0xDD.0xEE.0xFE
+
+🔹 Règle importante : Les 0 à gauche sont AFFICHÉS !
+   → Exemple : 0A(différent de A)
+   → En hexadécimal, 0A = 10 décimal (ne pas omettre le 0 !)
+
+🔹 Notation : 0x = préfixe hexadécimal
+   → 0x75 = 75 en hexadécimal = 117 en décimal
+   → On peut aussi écrire 75H (H pour Hexadécimal)
+
+🔹 Structure de l'adresse MAC (48 bits) :
+
+   ┌─────────────────────────────────────────────────────────────────────────────┐
+   │                         ADRESSE MAC (48 bits)                               │
+   ├─────────────────────────────────────┬───────────────────────────────────────┤
+   │  24 premiers bits (OUI)             │  24 derniers bits (ID constructeur)   │
+   │  Fabricant (ex: 00:1A:E3 = Cisco)   │  Numéro unique de la carte            │
+   └─────────────────────────────────────┴───────────────────────────────────────┘
+
+   → OUI = Organizationally Unique Identifier (identifiant unique du fabricant)
+   → Attribué par l'IEEE
+
+🔹 Exemple de décomposition :
+   Adresse MAC : 00:1A:E3:12:34:56
+   00:1A:E3 = Cisco (OUI du fabricant)
+   12:34:56 = Numéro unique de la carte
+
+🔹 Tous les périphériques réseau :
+   → Possèdent une carte réseau Ethernet (NIC)
+   → Ont donc une adresse MAC Ethernet UNIQUE
+
+🔹 La carte réseau n'accepte UNIQUEMENT :
+   → Les trames dont l'adresse MAC destination correspond à SA MAC
+   → Les trames de DIFFUSION (Broadcast)
+   → Les trames MULTICAST du groupe auquel elle appartient
+
+🔹 Types d'adresses MAC (3 types) :
+
+   ═══════════════════════════════════════════════════════════
+   ① UNICAST (1 vers 1)
+      → Adresse MAC unique d'un périphérique
+      → Exemple : 00:1A:E3:12:34:56 (PC1)
+      → Communication individuelle
+   ═══════════════════════════════════════════════════════════
+
+   ② BROADCAST (1 vers tous - DIFFUSION)
+      → FF:FF:FF:FF:FF:FF (tous les bits à 1)
+      → Envoyer à TOUS les périphériques du réseau local
+      → Exemple : requête ARP, DHCP Discover
+   ═══════════════════════════════════════════════════════════
+
+   ③ MULTICAST (1 vers un GROUPE)
+      → Adresse MAC spécifique pour un groupe
+      → IPv4 : 01:00:5E:XX:XX:XX
+      → IPv6 : 33:33:XX:XX:XX:XX
+      → Exemple : OSPF, STP, vidéo en streaming
+   ═══════════════════════════════════════════════════════════
+
+🔹 Adresse MAC de multidiffusion (Multicast) :
+
+   | Protocole encapsulé | Adresse MAC multicast               |
+   |---------------------|-------------------------------------|
+   | IPv4                | 01:00:5E:XX:XX:XX                   |
+   | IPv6                | 33:33:XX:XX:XX:XX                   |
+   | Autres (STP, etc.)  | Adresses spécifiques (ex: 01:80:C2:00:00:00 pour STP) |
+
+
+
+----------------------------------------------
+📌 À RETENIR 
+----------------------------------------------
+
+1️⃣ Ethernet = IEEE 802.3 (MAC + physique) + IEEE 802.2 (LLC)
+
+2️⃣ Trame Ethernet : MAC dest (6) + MAC src (6) + Type (2) + Données (46-1500) + FCS (4)
+
+3️⃣ Adresse MAC = 48 bits = 6 octets = 12 hexadécimales
+
+4️⃣ Types de MAC : UNICAST, BROADCAST (FF:FF:FF:FF:FF:FF), MULTICAST (01:00:5E, 33:33)
+
