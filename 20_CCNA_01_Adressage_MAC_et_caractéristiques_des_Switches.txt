@@ -1,0 +1,217 @@
+/*
+=============================================================================
+    🏷️ ADRESSAGE MAC ET CARACTÉRISTIQUES DES SWITCHES (CCNA 1 - Chapitre 7)
+=============================================================================
+
+📋 SOMMAIRE DU CHAPITRE :
+   1. Table d'adressage MAC (table CAM)
+   2. Méthodes de transmission (Store-and-Forward vs Cut-Through)
+   3. Mise en mémoire tampon (Buffering)
+   4. Paramètres Duplex et Vitesse
+   5. Auto-MDIX
+
+
+----------------------------------------------
+📊 1. TABLE D'ADRESSAGE MAC (TABLE CAM)
+----------------------------------------------
+
+🔹 Définition :
+   → La table d'adressage MAC (aussi appelée table CAM) est la table qui sert à prendre les décisions d'acheminement des trames au niveau du switch.
+
+🔹 Règle d'or (À retenir ABSOLUMENT) :
+   → Le switch utilise UNIQUEMENT les adresses MAC pour prendre ses décisions d'acheminement.
+   → JAMAIS d'adresse IP, JAMAIS d'autre information.
+   → L'élément unique pour le switching = l'adresse MAC.
+
+🔹 CAM (Content Addressable Memory) :
+   → C'est simplement un autre nom pour désigner la table d'adressage MAC.
+   → Mémoire spécialisée qui permet une recherche très rapide.
+
+🔹 Fonctionnement du switch à la réception d'une trame :
+
+   ÉTAPE 1 : Lire l'adresse MAC SOURCE
+      → Vérifier si elle existe déjà dans la table CAM
+      → Si NON → l'ajouter avec le numéro du port d'entrée
+
+   ÉTAPE 2 : Lire l'adresse MAC DESTINATION
+      → Rechercher cette adresse dans la table CAM
+      → Si trouvée → envoyer UNIQUEMENT vers le port correspondant
+      → Si NON trouvée → INONDER (flood) la trame sur TOUS les ports (sauf celui d'entrée)
+
+🔹 Pourquoi cette méthode ?
+   → Le switch ne sait pas où se trouve la destination
+   → Il envoie à tout le monde pour être sûr que ça arrive
+   → C'est ce qu'on appelle "monodiffusion inconnue" (unknown unicast flooding)
+
+🔹 Structure de la table CAM :
+
+   ┌─────────────────────────────────────────────────────────────────────────────┐
+   │                      TABLE CAM                                              │
+   ├─────────────────────────────────────────────────────────────────────────────┤
+   │ MAC Address          │ Port    │ VLAN   │ Type    │ Age (secondes)          │
+   ├──────────────────────┼─────────┼────────┼─────────┼─────────────────────────┤
+   │ 00:1A:E3:12:34:56    │ 1       │ 1      │ Dynamic │ 120                     │
+   │ 00:1A:E3:78:90:AB    │ 2       │ 1      │ Dynamic │ 85                      │
+   │ 00:1A:E3:CD:EF:12    │ 3       │ 1      │ Dynamic │ 230                     │
+   └─────────────────────────────────────────────────────────────────────────────┘
+
+🔹 Types d'entrées dans la table CAM :
+   → DYNAMIQUE : apprises automatiquement (expirent après 300 secondes par défaut)
+   → STATIQUE : configurées manuellement (ne expirent pas)
+
+🔹 Commande pour afficher la table MAC (Cisco) :
+    Switch# show mac address-table
+    Switch# show mac address-table dynamic
+    Switch# show mac address-table static
+
+
+----------------------------------------------
+⚡ 2. MÉTHODES DE TRANSMISSION
+----------------------------------------------
+
+🔹 Deux méthodes principales pour un switch :
+
+   ═══════════════════════════════════════════════════════════
+   ① STORE-AND-FORWARD (Stocker et retransmettre)
+      → Le switch reçoit TOUTE la trame
+      → Stocke la trame complète dans sa mémoire
+      → Vérifie l'intégrité avec le FCS (CRC) à la fin de la trame
+      → Si valide → transmise sur le port de sortie
+      → Si corrompue → rejetée
+      
+      ✅ Avantage : pas de trames corrompues transmises
+      ❌ Inconvénient : latence plus élevée
+      🏆 C'est la méthode LA PLUS UTILISÉE aujourd'hui !
+   ═══════════════════════════════════════════════════════════
+
+   ② CUT-THROUGH (Couper au travers)
+      → Dès que l'adresse MAC destination est lue (6 premiers octets)
+      → Le switch transmet IMMÉDIATEMENT la trame
+      → Ne vérifie PAS le CRC
+      
+      ✅ Avantage : très rapide (faible latence)
+      ❌ Inconvénient : transmet les trames corrompues
+      
+      Deux variantes du Cut-Through :
+      
+      a) FAST FORWARD (Retransmission rapide)
+         → Lit les 6 premiers octets (MAC destination)
+         → Transmet immédiatement
+         → Latence minimale (quelques microsecondes)
+      
+      b) FRAGMENT-FREE (Sans fragment)
+         → Lit les 64 premiers octets
+         → Vérifie qu'il n'y a pas eu de collision
+         → Transmet le reste
+         → Compromis entre rapidité et fiabilité
+   ═══════════════════════════════════════════════════════════
+
+🔹 Tableau comparatif :
+
+   | Méthode            | Lecture      | Vérification CRC | Latence    | Transmet erreurs ? |
+   |--------------------|--------------|------------------|------------|--------------------|
+   | Store-and-Forward  | Trame entière| OUI              | Élevée     | NON                |
+   | Cut-Through        | 6 octets     | NON              | Très faible| OUI                |
+   | Fragment-Free      | 64 octets    | Partielle        | Faible     | Parfois            |
+
+
+----------------------------------------------
+💾 3. MISE EN MÉMOIRE TAMPON (BUFFERING)
+----------------------------------------------
+
+🔹 Définition :
+   → Comment le switch gère le stockage temporaire des trames
+   → Nécessaire car les trames arrivent et repartent à des vitesses différentes
+
+🔹 Les 2 techniques de mise en mémoire tampon :
+
+   ═══════════════════════════════════════════════════════════
+   ① MÉMOIRE TAMPON PARTAGÉE (Shared Memory Buffering)
+      → Toutes les trames qui arrivent sont stockées dans la MÊME mémoire tampon
+      → Le switch traite les trames une par une
+      → Plus simple mais peut causer des retards
+   ═══════════════════════════════════════════════════════════
+
+   ② MÉMOIRE TAMPON PAR PORT (Port-based Buffering)
+      → Chaque interface a sa PROPRE file d'attente (queue)
+      → Des espaces mémoires DÉDIÉS pour chaque port
+      → Meilleure gestion des flux
+      → Utilisé dans les switches modernes
+   ═══════════════════════════════════════════════════════════
+
+
+----------------------------------------------
+⚙️ 4. PARAMÈTRES DUPLEX ET VITESSE
+----------------------------------------------
+
+🔹 DUPLEX :
+
+   | Mode        | Description                                     | Utilisation           |
+   |-------------|-------------------------------------------------|-----------------------|
+   | Half-Duplex | Envoi OU réception (pas les deux en même temps) | Anciens réseaux, hubs |
+   | Full-Duplex | Envoi ET réception SIMULTANÉMENT                | Switches modernes     |
+
+   📌 Le switch moderne fonctionne en Full-Duplex → pas de collisions.
+
+   Commande Cisco :
+    Switch(config-if)# duplex full    (force full-duplex)
+    Switch(config-if)# duplex half    (force half-duplex)
+    Switch(config-if)# duplex auto    (négociation automatique)
+
+🔹 VITESSE :
+
+   | Type de port          | Vitesse          | Statut          |
+   |-----------------------|------------------|-----------------|
+   | Ethernet              | 10 Mbps          | Ancien          |
+   | FastEthernet          | 100 Mbps         | Ancien          |
+   | GigabitEthernet       | 1 Gbps           | Standard actuel |
+   | 10 GigabitEthernet    | 10 Gbps          | Haut débit      |
+   | 40/100 GigabitEthernet| 40/100 Gbps      | Très haut débit |
+
+   Commande Cisco :
+    Switch(config-if)# speed 1000    (force 1 Gbps)
+    Switch(config-if)# speed auto    (négociation automatique)
+
+
+----------------------------------------------
+🔄 5. AUTO-MDIX
+----------------------------------------------
+
+🔹 Définition :
+   → Auto-MDIX = détection AUTOMATIQUE du type de câble (droit ou croisé)
+   → Le switch s'adapte automatiquement
+   → Plus besoin de se souvenir de la règle "pareil → croisé, différent → droit"
+
+🔹 Comment ça marche :
+   → Le switch détecte le type de câble branché
+   → Il ajuste ses broches (émission/réception) en conséquence
+
+🔹 Commande Cisco :
+    Switch(config-if)# mdix auto
+
+🔹 Conditions pour que Auto-MDIX fonctionne :
+   → Les deux équipements doivent le supporter
+   → La vitesse doit être en négociation automatique (auto)
+
+🔹 Activation par défaut :
+   → Auto-MDIX est activé par défaut sur les versions 12.2(18)SE et supérieures de l'IOS Cisco
+
+
+----------------------------------------------
+📌 À RETENIR 
+----------------------------------------------
+
+1️⃣ Le switch utilise UNIQUEMENT les adresses MAC pour acheminer les trames (JAMAIS d'IP).
+
+2️⃣ CAM = table d'adressage MAC.
+
+3️⃣ Si la MAC destination n'est pas dans la table → inondation (flood) sur tous les ports.
+
+4️⃣ Store-and-Forward = fiable (vérifie le CRC) → méthode la plus utilisée.
+
+5️⃣ Cut-Through = rapide (ne vérifie pas) → transmet les erreurs.
+
+6️⃣ Full-Duplex = pas de collisions (switch moderne).
+
+7️⃣ Auto-MDIX = détection automatique du type de câble (activé par défaut).
+
