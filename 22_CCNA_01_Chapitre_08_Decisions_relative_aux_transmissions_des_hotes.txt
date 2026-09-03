@@ -1,0 +1,174 @@
+
+==============================================
+    🧭 DÉCISIONS RELATIVES AUX TRANSMISSIONS DES HÔTES (CCNA 1 - Chapitre 8)
+==============================================
+
+🔹 Un hôte (PC, serveur, etc.) peut envoyer des paquets à 3 types de destinations :
+   1. Lui-même (localhost)
+   2. Hôtes locaux (même réseau LAN)
+   3. Hôtes distants (autre réseau, via WAN)
+
+
+----------------------------------------------
+🏠 1. ENVOI À LUI-MÊME (LOCALHOST)
+----------------------------------------------
+
+🔹 Adresse : 127.0.0.1 (localhost)
+   → Les paquets ne sortent JAMAIS de la machine
+   → Utilisé pour les tests internes (vérifier que la pile IP fonctionne)
+
+🔹 Commande de test :
+    C:\> ping 127.0.0.1
+   → Si ça fonctionne → la pile TCP/IP est opérationnelle
+
+
+----------------------------------------------
+🏘️ 2. ENVOI À UN HÔTE LOCAL (MÊME RÉSEAU LAN)
+----------------------------------------------
+
+🔹 Condition :
+   → La destination est sur le MÊME réseau IP que la source
+   → Les deux adresses IP partagent la même partie "réseau"
+
+🔹 Exemple :
+   → PC1 : 192.168.1.10/24
+   → PC2 : 192.168.1.20/24
+   → Les deux sont dans le réseau 192.168.1.0/24 → MÊME LAN
+
+🔹 Fonctionnement :
+   → Le PC vérifie que la destination est sur le même réseau
+   → Il envoie le paquet DIRECTEMENT à la destination
+   → Besoin de l'adresse MAC de la destination (via ARP)
+   → PAS besoin de routeur
+
+🔹 Protocole utilisé :
+   → ARP (Address Resolution Protocol) pour trouver l'adresse MAC
+   → La trame est envoyée directement au destinataire
+
+
+----------------------------------------------
+🌍 3. ENVOI À UN HÔTE DISTANT (AUTRE RÉSEAU)
+----------------------------------------------
+
+🔹 Condition :
+   → La destination est sur un RÉSEAU DIFFÉRENT
+   → Les deux adresses IP ont des parties "réseau" différentes
+
+🔹 Exemple :
+   → PC1 : 192.168.1.10/24 (réseau 192.168.1.0)
+   → PC3 : 10.0.0.10/24 (réseau 10.0.0.0)
+   → Réseaux DIFFÉRENTS → communication via routeur
+
+🔹 Fonctionnement :
+   → Le PC sait que la destination est sur un autre réseau
+   → Il ne peut pas envoyer directement
+   → Il doit passer par un équipement intermédiaire : le ROUTEUR
+
+🔹 Équipement clé : LA PASSERELLE PAR DÉFAUT (Default Gateway)
+   → C'est l'adresse IP du routeur sur le réseau local
+   → Tous les paquets destinés à l'extérieur du LAN y sont envoyés
+
+
+----------------------------------------------
+🔑 4. LA PASSERELLE PAR DÉFAUT (DEFAULT GATEWAY)
+----------------------------------------------
+
+🔹 Définition :
+   → L'adresse IP du routeur sur le réseau local
+   → Le "point de sortie" du réseau local vers l'extérieur
+
+🔹 Pourquoi c'est OBLIGATOIRE ?
+   → Le PC ne connaît que son propre réseau
+   → Si la destination est ailleurs → il doit envoyer à la passerelle
+   → Sans passerelle → impossible de sortir du LAN
+
+🔹 Configuration sur le PC :
+   → Dans les propriétés IPv4
+   → Champ : "Passerelle par défaut"
+   → Entrer l'adresse de l'interface du routeur sur ce réseau
+
+🔹 Exemple :
+   → PC en 192.168.1.10/24
+   → Routeur interface g0/0 : 192.168.1.254/24
+   → Passerelle par défaut du PC = 192.168.1.254
+
+🔹 Configuration sur le routeur :
+   → Le routeur doit avoir UNE interface sur le réseau local
+   → Et UNE AUTRE interface vers l'extérieur
+   → Minimum 2 interfaces pour faire du routage
+
+
+----------------------------------------------
+🚦 5. TABLEAU RÉCAPITULATIF (Décisions de l'hôte)
+----------------------------------------------
+
+| Type de destination        | Le PC envoie à        | Besoin d'un routeur ? | Protocole utilisé |
+|----------------------------|-----------------------|-----------------------|-------------------|
+| Lui-même (127.0.0.1)       | Lui-même              | NON                   | Ne sort jamais    |
+| Hôte local (même LAN)      | Hôte directement      | NON                   | ARP → MAC         |
+| Hôte distant (autre réseau)| Passerelle par défaut | OUI                   | Routage IP        |                   
+
+
+----------------------------------------------
+🔧 6. CONDITIONS POUR QUE LE ROUTAGE FONCTIONNE
+----------------------------------------------
+
+🔹 Condition 1 : Le routeur doit avoir AU MOINS 2 interfaces
+   → Une interface sur le réseau LOCAL (entrée)
+   → Une interface vers le réseau DISTANT (sortie)
+   → Exemple : g0/0 (LAN) et g0/1 (WAN)
+
+🔹 Condition 2 : Le routeur doit avoir une adresse IP configurée sur chaque interface
+   → Exemple : g0/0 = 192.168.1.254
+   → Exemple : g0/1 = 10.0.0.254
+
+🔹 Condition 3 : Les hôtes doivent avoir la passerelle par défaut configurée
+   → PC sur réseau 192.168.1.0/24 → passerelle = 192.168.1.254
+   → PC sur réseau 10.0.0.0/24 → passerelle = 10.0.0.254
+
+🔹 Condition 4 : Le routage doit être configuré
+   → ROUTAGE STATIQUE : on ajoute les routes manuellement (ip route)
+   → ROUTAGE DYNAMIQUE : les routeurs apprennent les routes entre eux
+        • OSPF (le plus courant)
+        • EIGRP (Cisco)
+        • RIP (ancien)
+
+
+----------------------------------------------
+📊 7. SCHÉMA DE FONCTIONNEMENT
+----------------------------------------------
+
+   [PC1] 192.168.1.10/24
+      │ (passerelle = 192.168.1.254)
+      │
+      ↓
+   [Routeur] (g0/0 = 192.168.1.254)
+      │ (g0/1 = 10.0.0.254)
+      │
+      ↓
+   [PC3] 10.0.0.10/24 (passerelle = 10.0.0.254)
+
+   PC1 veut envoyer à PC3 :
+   1. PC1 voit que 10.0.0.10 est sur un autre réseau
+   2. PC1 envoie le paquet à la passerelle : 192.168.1.254
+   3. Le routeur reçoit le paquet
+   4. Le routeur regarde sa table de routage
+   5. Il trouve le chemin vers 10.0.0.0/24
+   6. Il envoie le paquet via g0/1 vers PC3
+
+
+----------------------------------------------
+📌 À RETENIR 
+----------------------------------------------
+
+1️⃣ Un hôte peut envoyer à 3 destinations : lui-même (127.0.0.1), LAN, WAN
+
+2️⃣ Si même réseau → envoi DIRECT (via ARP) → PAS de routeur
+
+3️⃣ Si autre réseau → envoi à la PASSERELLE PAR DÉFAUT → routeur
+
+4️⃣ Passerelle par défaut = adresse IP du routeur sur le LAN (.254)
+
+5️⃣ Le routeur doit avoir AU MOINS 2 interfaces pour faire du routage
+
+6️⃣ Sans passerelle configurée, un PC ne peut PAS sortir de son réseau
