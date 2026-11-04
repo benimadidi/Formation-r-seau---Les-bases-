@@ -1,0 +1,203 @@
+
+==============================================
+    🔎 RÉSOLUTION DES ADRESSES (CCNA 1 - Chapitre 9)
+==============================================
+
+📋 SOMMAIRE DU CHAPITRE :
+   1. Comparaison adresse MAC vs adresse IP
+   2. Protocole ARP (Address Resolution Protocol)
+   3. Protocole NDP (Neighbor Discovery Protocol) pour IPv6
+
+
+----------------------------------------------
+🏷️ 1. RÔLE DE L'ADRESSE MAC ET DE L'ADRESSE IP
+----------------------------------------------
+
+🔹 RAPPEL FONDAMENTAL :
+   → L'adresse IP ne sert à RIEN dans un réseau local, SAUF à trouver l'adresse MAC de la destination.
+   → Grâce à l'IP, on trouve la MAC.
+   → Grâce à la MAC, on achemine les données.
+
+🔹 Comparaison des deux adresses :
+
+   | Critère        | Adresse IP (logique)              | Adresse MAC (physique)              |
+   |----------------|-----------------------------------|-------------------------------------|
+   | Couche OSI     | 3 - Réseau                        | 2 - Liaison de données              |
+   | Rôle           | Trouver le réseau de destination  | Acheminer la trame physiquement     |
+   | Portée         | Globale (Internet)                | Locale (LAN uniquement)             |
+   | Format         | 192.168.1.1                       | AA:BB:CC:DD:EE:FF                   |
+   | Modification   | Peut changer (DHCP)               | Fixe (gravée dans la NIC)           |
+
+🔹 Le protocole qui fait le lien : ARP
+
+
+----------------------------------------------
+📡 2. PROTOCOLE ARP (ADDRESS RESOLUTION PROTOCOL)
+----------------------------------------------
+
+🔹 Définition :
+   → ARP = Address Resolution Protocol
+   → Protocole qui permet de trouver l'adresse MAC correspondant à une adresse IP
+   → Fonctionne uniquement dans un réseau local (LAN)
+
+🔹 Les 4 informations nécessaires pour envoyer une trame :
+
+   | Information        | PC1 connaît ? | Contenu                          |
+   |--------------------|---------------|----------------------------------|
+   | IP source          | ✅ OUI        | IP1 (sa propre IP)               |
+   | MAC source         | ✅ OUI        | MAC1 (sa propre carte réseau)    |
+   | IP destination     | ✅ OUI        | IP2 (adresse de PC2)             |
+   | MAC destination    | ❌ NON        | Inconnue → besoin d'ARP !        |
+
+🔹 FONCTIONNEMENT D'ARP (étape par étape) :
+
+   ═══════════════════════════════════════════════════════════
+   ÉTAPE 1 : PC1 veut envoyer à PC2
+      → Il connaît IP2 mais pas la MAC de PC2
+      → Il envoie une REQUÊTE ARP en DIFFUSION (broadcast)
+      → MAC destination = FF:FF:FF:FF:FF:FF
+   ═══════════════════════════════════════════════════════════
+
+   ═══════════════════════════════════════════════════════════
+   ÉTAPE 2 : La requête ARP en diffusion
+      → Question posée : "Qui a l'adresse IP 192.168.1.20 ? Qu'il me donne son MAC !"
+      → Tous les PC du LAN reçoivent la requête
+   ═══════════════════════════════════════════════════════════
+
+   ═══════════════════════════════════════════════════════════
+   ÉTAPE 3 : Les PC non concernés rejettent
+      → Les PC qui n'ont pas l'IP demandée IGNORENT la requête
+   ═══════════════════════════════════════════════════════════
+
+   ═══════════════════════════════════════════════════════════
+   ÉTAPE 4 : PC2 répond en UNICAST
+      → PC2 a l'IP demandée
+      → Il répond DIRECTEMENT à PC1 (monodiffusion)
+      → Sa réponse contient son adresse MAC
+   ═══════════════════════════════════════════════════════════
+
+   ═══════════════════════════════════════════════════════════
+   ÉTAPE 5 : PC1 stocke l'information
+      → PC1 met la correspondance IP↔MAC dans son CACHE ARP
+      → Les prochains paquets n'auront plus besoin d'ARP
+   ═══════════════════════════════════════════════════════════
+
+🔹 Schéma du fonctionnement :
+
+   [PC1] ──── Requête ARP (Broadcast FF:FF:FF:FF:FF:FF) ────→ [PC2]
+      │      "Qui a l'IP 192.168.1.20 ?"                        │
+      │                                                         │
+      │ ←──── Réponse ARP (Unicast, MAC de PC2) ───────────────┘
+      │
+      ↓
+   Cache ARP mis à jour
+
+🔹 Rôle du switch dans ARP :
+   → Le switch reçoit la requête en diffusion
+   → Il INONDE (flood) la requête sur tous ses ports
+   → Il en PROFITE pour remplir sa table MAC dynamiquement
+   → Chaque requête ARP = occasion d'apprendre des adresses MAC
+
+🔹 Le CACHE ARP :
+   → Table locale sur chaque machine
+   → Contient les correspondances IP ↔ MAC apprises
+   → Expire après un certain temps (généralement quelques minutes)
+
+🔹 Commandes pratiques :
+
+   | Commande         | Rôle                                      |
+   |------------------|-------------------------------------------|
+   | arp -a           | Affiche le cache ARP                      |
+   | arp -d           | Efface le cache ARP                       |
+   | arp -s           | Ajoute une entrée statique                |
+
+   Exemple :
+    C:\> arp -a
+    Interface: 192.168.1.10 --- 0x5
+      Internet Address      Physical Address      Type
+      192.168.1.1           aa-bb-cc-dd-ee-ff     dynamic
+      192.168.1.254         00-11-22-33-44-55     dynamic
+
+   Sur un switch Cisco :
+    Switch# show mac address-table
+
+
+----------------------------------------------
+🔍 3. PROTOCOLE NDP (NEIGHBOR DISCOVERY PROTOCOL) - IPv6
+----------------------------------------------
+
+🔹 Définition :
+   → NDP = Neighbor Discovery Protocol
+   → Protocole de découverte des voisins pour IPv6
+   → REMPLACE ARP (car ARP n'existe pas en IPv6)
+
+🔹 Pourquoi pas ARP en IPv6 ?
+   → IPv6 a été conçu pour être PLUS EFFICACE
+   → On ne veut PAS alourdir les procédures
+   → NDP fait la même chose qu'ARP mais en version "lite" et plus moderne
+
+🔹 Les 2 types de requêtes NDP (via ICMPv6) :
+
+   ═══════════════════════════════════════════════════════════
+   ① ND (Neighbor Discovery) - Requête de découverte
+      → Équivalent de la requête ARP
+      → "Qui a cette adresse IPv6 ? Donne-moi ton MAC"
+      → Envoyée en MULTICAST (pas de broadcast en IPv6)
+   ═══════════════════════════════════════════════════════════
+
+   ② NA (Neighbor Advertisement) - Réponse de découverte
+      → Équivalent de la réponse ARP
+      → "C'est moi, voici mon adresse MAC"
+      → Envoyée en UNICAST
+   ═══════════════════════════════════════════════════════════
+
+🔹 Particularités de NDP vs ARP :
+
+   | Critère          | ARP (IPv4)              | NDP (IPv6)                    |
+   |------------------|-------------------------|-------------------------------|
+   | Diffusion        | Broadcast (FF:FF:...)   | MULTICAST uniquement          |
+   | Protocole        | ARP direct              | ICMPv6 (ND et NA)             |
+   | Efficacité       | Moins efficace          | Plus efficace                 |
+   | Sécurité         | Vulnérable (ARP spoofing)| Options de sécurité intégrées |
+
+🔹 À retenir pour l'instant :
+   → En IPv6, pas d'ARP
+   → NDP remplace ARP avec ND (requête) et NA (réponse)
+   → Les détails seront vus plus tard dans la formation IPv6
+
+
+----------------------------------------------
+📊 RÉCAPITULATIF COMPARATIF
+----------------------------------------------
+
+   | Élément                  | IPv4                          | IPv6                                |
+   |--------------------------|-------------------------------|-------------------------------------|
+   | Protocole de résolution  | ARP                           | NDP (ICMPv6)                        |
+   | Requête                  | ARP Request (broadcast)       | ND (multicast)                      |
+   | Réponse                  | ARP Reply (unicast)           | NA (unicast)                        |
+   | Diffusion                | OUI (FF:FF:FF:FF:FF:FF)       | NON (multicast uniquement)          |
+   | Commande de vérification | arp -a                        | netsh interface ipv6 show neighbors |
+
+
+----------------------------------------------
+📌 À RETENIR POUR L'EXAMEN CCNA
+----------------------------------------------
+
+1️⃣ L'IP ne sert qu'à trouver la MAC dans un LAN
+   → L'IP trouve le réseau
+   → La MAC achemine physiquement la trame
+
+2️⃣ ARP = Address Resolution Protocol
+   → Trouve la MAC à partir de l'IP
+   → Requête en BROADCAST (FF:FF:FF:FF:FF:FF)
+   → Réponse en UNICAST
+
+3️⃣ Le switch profite de chaque requête ARP pour remplir sa table MAC dynamiquement
+
+4️⃣ Cache ARP = table locale des correspondances IP↔MAC
+   → Commande : arp -a (afficher), arp -d (effacer)
+
+5️⃣ IPv6 n'a PAS d'ARP → utilise NDP (ICMPv6)
+   → ND (Neighbor Discovery) = requête
+   → NA (Neighbor Advertisement) = réponse
+   → Pas de broadcast en IPv6, uniquement du MULTICAST
