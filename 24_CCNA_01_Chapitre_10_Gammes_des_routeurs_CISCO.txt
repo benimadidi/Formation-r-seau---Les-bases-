@@ -1,0 +1,91 @@
+/*
+==============================================
+    🖥️ GAMME DES ROUTEURS CISCO (CCNA 1 - Chapitre 10)
+==============================================
+
+📋 SOMMAIRE DU CHAPITRE :
+   1. Présentation des routeurs Cisco
+   2. Gammes et modèles principaux
+   3. Configuration de base (aperçu)
+
+
+----------------------------------------------
+🎯 OBJECTIF DU CHAPITRE
+----------------------------------------------
+
+🔹 Ce chapitre porte sur la CONFIGURATION DE BASE DES ROUTEURS CISCO :
+   → Configuration des paramètres initiaux
+   → Configuration des interfaces
+   → Configuration de la passerelle par défaut (déjà abordée)
+
+🔹 Les configurations pratiques commencent dans les vidéos suivantes.
+
+
+----------------------------------------------
+🖥️ 1. LES ROUTEURS CISCO : GAMMES ET MODÈLES
+----------------------------------------------
+
+🔹 Cisco propose plusieurs gammes de routeurs selon les besoins :
+
+   | Gamme      | Modèles courants           | Utilisation typique                        |
+   |------------|----------------------------|--------------------------------------------|
+   | Série 800  | 800, 880, 890              | Petits bureaux, télétravail, PME           |
+   | Série 1900 | 1900, 1921, 1941           | PME, agences, filiales                     |
+   | Série 2900 | 2900, 2911, 2921           | Entreprises moyennes                       |
+   | Série 4000 | 4300, 4400                 | Grandes entreprises, succursales           |
+   | ISR        | Integrated Services Router | Gamme intégrée (routage + services)        |
+   | ASR        | ASR 1000, ASR 9000         | Opérateurs, grandes infrastructures        |
+
+🔹 Spécifications vues dans cette vidéo :
+   → Routeurs Cisco 800
+   → Routeurs Cisco 890
+   → Routeurs Cisco 1900
+   → Routeurs Cisco 1941
+   → Et autres modèles de la gamme
+
+🔹 Critères de choix d'un routeur :
+   → Nombre d'interfaces (LAN/WAN)
+   → Débit (bande passante supportée)
+   → Services intégrés (firewall, VPN, QoS)
+   → Nombre d'utilisateurs à supporter
+   → Budget
+
+
+----------------------------------------------
+⚙️ 2. CE QUI SERA CONFIGURÉ (APERÇU)
+----------------------------------------------
+
+🔹 Paramètres initiaux :
+   → Nom du routeur (hostname)
+   → Mots de passe (enable secret, console, vty)
+   → Bannière (banner motd)
+
+🔹 Configuration des interfaces :
+   → Attribution des adresses IP
+   → Activation (no shutdown)
+   → Description des interfaces
+
+🔹 Passerelle par défaut :
+   → Configuration de la route par défaut
+   → Rappel : ip route 0.0.0.0 0.0.0.0 [next-hop]
+
+🔹 Sauvegarde :
+   → copy running-config startup-config
+
+
+----------------------------------------------
+📌 À RETENIR POUR L'EXAMEN CCNA
+----------------------------------------------
+
+1️⃣ Les routeurs Cisco se déclinent en plusieurs gammes :
+   → 800/890 = petits bureaux
+   → 1900/2900 = PME et entreprises moyennes
+   → 4000/ASR = grandes infrastructures
+
+2️⃣ La configuration de base d'un routeur comprend :
+   → Paramètres initiaux (nom, mots de passe)
+   → Interfaces (IP, no shutdown)
+   → Passerelle par défaut
+   → Sauvegarde
+
+3️⃣ Les configurations pratiques seront vues dans les vidéos suivantes.

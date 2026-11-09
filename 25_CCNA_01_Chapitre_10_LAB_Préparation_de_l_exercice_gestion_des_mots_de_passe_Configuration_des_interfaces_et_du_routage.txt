@@ -1,0 +1,341 @@
+
+==============================================
+    🖥️ CONFIGURATION D'UN ROUTEUR CISCO (CCNA 1 - Chapitre 10)
+==============================================
+
+🔹 Objectif :
+   → Configurer un routeur en partant de ZÉRO
+   → Comme si on n'avait jamais touché à un routeur
+
+📋 SOMMAIRE :
+   1. Premier démarrage et assistant de configuration
+   2. Les modes de configuration
+   3. Configuration de base (hostname, mots de passe)
+   4. Configuration des interfaces
+   5. Routage statique
+   6. Accès distant : Telnet et SSH
+
+
+----------------------------------------------
+🚀 1. PREMIER DÉMARRAGE DU ROUTEUR
+----------------------------------------------
+
+🔹 Message d'assistant au premier démarrage :
+
+    --- System Configuration Dialog ---
+    Would you like to enter the initial configuration dialog? [yes/no]:
+
+🔹 Ce message est TRÈS IMPORTANT :
+   → Il n'apparaît QUE si la NVRAM est VIDE
+   → NVRAM = mémoire qui stocke la configuration du routeur
+   → C'est le signe que le routeur n'a JAMAIS été configuré
+
+🔹 Que répondre ?
+   → Taper "no" pour configurer manuellement (recommandé en CCNA)
+   → Taper "yes" pour utiliser l'assistant (déconseillé)
+
+
+----------------------------------------------
+🎛️ 2. LES MODES DE CONFIGURATION
+----------------------------------------------
+
+🔹 MODE UTILISATEUR :
+   → Prompt : Router>
+   → Très peu de choix
+   → Commandes de consultation basiques uniquement
+
+🔹 MODE PRIVILÉGIÉ (ou administrateur) :
+   → Commande : enable
+   → Prompt : Router#
+   → Beaucoup de possibilités SAUF configurer l'équipement
+   → La commande la plus utilisée : show
+   → C'est ici qu'on SAUVEGARDE la configuration
+
+🔹 MODE DE CONFIGURATION GLOBALE :
+   → Commande : configure terminal (ou conf t)
+   → Prompt : Router(config)#
+   → C'est ici qu'on CONFIGURE l'équipement
+
+🔹 Schéma des modes :
+
+    Router>                     ← Mode utilisateur
+       │ enable
+       ↓
+    Router#                     ← Mode privilégié
+       │ configure terminal
+       ↓
+    Router(config)#             ← Mode configuration globale
+       │ interface g0/0
+       ↓
+    Router(config-if)#          ← Mode configuration interface
+
+
+----------------------------------------------
+💾 3. SAUVEGARDER LA CONFIGURATION
+----------------------------------------------
+
+🔹 Depuis le mode PRIVILÉGIÉ (Router#) :
+
+    Router# copy running-config startup-config
+    (version courte : Router# copy run start)
+
+🔹 Explication :
+   → running-config = configuration en cours (RAM)
+   → startup-config = configuration sauvegardée (NVRAM)
+   → On COPIE la RAM vers la NVRAM
+
+🔹 Autres commandes équivalentes :
+    Router# write memory
+    Router# w
+
+📌 Commande à retenir : copy run start ou w
+
+
+----------------------------------------------
+🏷️ 4. CONFIGURATION DE BASE
+----------------------------------------------
+
+🔹 Changer le nom du routeur :
+
+    Router(config)# hostname [nom_du_routeur]
+
+   Exemple :
+    Router(config)# hostname R1
+    R1(config)#
+
+🔹 Pourquoi changer le nom ?
+   → Facilite le travail sur les LOGS
+   → Nécessaire pour SSH (on le verra plus tard)
+
+🔹 Gestion des mots de passe :
+
+   | Commande                          | Chiffrement            | Recommandé |
+   |-----------------------------------|------------------------|------------|
+   | enable password [mdp]             | Clair (ou Cisco-set)   | ❌ Non     |
+   | enable secret [mdp]               | MD5 (type 5)           | ✅ OUI     |
+
+   → enable secret est TOUJOURS prioritaire sur enable password
+
+🔹 Chiffrer les mots de passe en clair (cas de enable password) :
+
+    Router(config)# service password-encryption
+
+   → Utilise l'algorithme Cisco-set (type 7)
+   → Faible sécurité mais mieux que rien
+
+🔹 ASTUCE pour exécuter une commande privilégiée depuis conf t :
+
+    Router(config)# do [commande]
+
+   Exemple :
+    R1(config)# do show ip interface brief
+
+   → Permet de lancer une commande du mode privilégié sans en sortir
+
+
+----------------------------------------------
+🔌 5. CONFIGURATION DES INTERFACES
+----------------------------------------------
+
+🔹 Étapes :
+
+   1. Entrer dans le mode configuration globale
+      Router# configure terminal
+
+   2. Aller dans le sous-mode interface
+      Router(config)# interface [nom_interface]
+
+   3. Attribuer une adresse IP
+      Router(config-if)# ip address [ip] [masque]
+
+   4. Démarrer l'interface
+      Router(config-if)# no shutdown
+
+🔹 Exemple concret :
+
+    R1> enable
+    R1# configure terminal
+    R1(config)# interface g0/0
+    R1(config-if)# ip address 192.168.1.254 255.255.255.0
+    R1(config-if)# no shutdown
+    R1(config-if)# exit
+    R1(config)# interface g0/1
+    R1(config-if)# ip address 192.168.2.254 255.255.255.0
+    R1(config-if)# no shutdown
+    R1(config-if)# end
+    R1# copy running-config startup-config
+
+🔹 Commandes de vérification :
+
+   | Commande                            | Utilité                                    |
+   |-------------------------------------|--------------------------------------------|
+   | show interface [nom_interface]      | Infos détaillées sur une interface         |
+   | show ip interface brief             | État GLOBAL de toutes les interfaces       |
+   | show running-config                 | Configuration en cours                     |
+
+🔹 Exemple de résultat de show ip interface brief :
+
+    Interface              IP-Address      OK? Method Status   Protocol
+    GigabitEthernet0/0     192.168.1.254   YES manual up       up
+    GigabitEthernet0/1     192.168.2.254   YES manual up       up
+
+📌 À retenir : sans no shutdown, l'interface reste "administratively down"
+
+
+----------------------------------------------
+🗺️ 6. ROUTAGE STATIQUE
+----------------------------------------------
+
+🔹 Le problème du LAB :
+
+   → 2 routeurs → 2 réseaux directs
+   → Mais chaque interface = un réseau différent
+   → Donc 3 réseaux au total dans le lab
+   → Un ping du réseau 1 vers le réseau 3 ÉCHOUE
+
+🔹 Pourquoi ?
+   → Un routeur ne peut PAS sauter de réseau sans le connaître
+   → Il faut lui APPRENDRE les réseaux distants
+
+🔹 C'est ça, le ROUTAGE :
+   → Faire connaître tous les réseaux aux routeurs
+   → Synchroniser les tables de routage entre les routeurs
+
+🔹 Deux types de routage :
+   → ROUTAGE STATIQUE : configuration manuelle
+   → ROUTAGE DYNAMIQUE : les routeurs apprennent entre eux (OSPF, RIP, EIGRP)
+
+🔹 Commande de route statique :
+
+    Router(config)# ip route [reseau] [masque] [passerelle]
+
+   Exemple :
+    R1(config)# ip route 192.168.1.0 255.255.255.0 192.168.3.1
+
+   → 192.168.1.0 = réseau destination
+   → 255.255.255.0 = masque du réseau destination
+   → 192.168.3.1 = prochain saut (next-hop = IP du routeur voisin)
+
+🔹 Vérification :
+
+    R1# show ip route
+
+   → La route apparaît avec le code "S" (Static)
+
+
+----------------------------------------------
+🌐 7. ACCÈS DISTANT : TELNET ET SSH
+----------------------------------------------
+
+🔹 Deux protocoles d'accès à distance :
+
+   | Protocole | Port | Sécurité          | Recommandation   |
+   |-----------|------|-------------------|------------------|
+   | Telnet    | 23   | ❌ NON (en clair) | Ancien, à éviter |
+   | SSH       | 22   | ✅ OUI (chiffré)  | Standard moderne |
+
+═══════════════════════════════════════════════════════════
+   📞 CONFIGURATION DE TELNET
+═══════════════════════════════════════════════════════════
+
+🔹 Étapes :
+
+    R1(config)# line vty 0 4
+    R1(config-line)# password [mot_de_passe]
+    R1(config-line)# login
+    R1(config-line)# exit
+
+🔹 Explication :
+   → line vty 0 4 = lignes virtuelles de 0 à 4 (5 sessions simultanées max)
+   → login = active la demande de mot de passe
+   → NE FONCTIONNE QUE si un mot de passe est configuré
+
+🔹 Prérequis OBLIGATOIRES pour Telnet :
+   ① Un mot de passe sur la ligne VTY
+   ② Un enable secret configuré (sinon impossible de passer en mode privilégié)
+
+🔹 Depuis le PC distant :
+
+    C:\> telnet [adresse_ip_equipement]
+
+⚠️ Telnet reste MOINS SÉCURISÉ et TRÈS ANCIEN
+   → Tout circule en clair sur le réseau
+   → À ne pas utiliser en production
+
+═══════════════════════════════════════════════════════════
+   🔐 CONFIGURATION DE SSH
+═══════════════════════════════════════════════════════════
+
+🔹 Prérequis (À RESPECTER DANS L'ORDRE) :
+
+   ① L'équipement doit avoir un NOM (pas "Router")
+   ② Un username et un mot de passe doivent être configurés
+   ③ Un domain-name doit être configuré
+   ④ Générer le certificat RSA
+
+🔹 Étape 1 : Nom du routeur
+
+    Router(config)# hostname R1
+
+🔹 Étape 2 : Username et mot de passe
+
+    R1(config)# username [nom_utilisateur] secret [mot_de_passe]
+
+🔹 Étape 3 : Domain-name
+
+    R1(config)# ip domain name cisco.com
+
+   → Pourquoi ? Parce que la génération des certificats exige un nom de domaine
+   → Le certificat porte le nom de l'équipement + le nom de domaine
+
+🔹 Étape 4 : Générer le certificat RSA
+
+    R1(config)# crypto key generate rsa
+
+   → RSA = protocole de génération des certificats
+   → Taille recommandée : 2048 bits
+
+🔹 Étape 5 : Activer SSH sur les lignes VTY
+
+    R1(config)# line vty 0 4
+    R1(config-line)# login local
+    R1(config-line)# transport input ssh
+    R1(config-line)# exit
+
+🔹 Explication :
+   → login local = utilise la base locale (username/secret configurés)
+   → transport input ssh = n'autorise QUE SSH (bloque Telnet)
+
+🔹 Depuis le PC distant :
+
+    C:\> ssh -l admin [adresse_ip_equipement]
+
+🔹 Vérification :
+
+    R1# show ip ssh
+    R1# show crypto key mypubkey rsa
+
+
+----------------------------------------------
+📌 À RETENIR POUR L'EXAMEN CCNA
+----------------------------------------------
+
+1️⃣ Le message "initial configuration dialog" n'apparaît que si la NVRAM est VIDE
+
+2️⃣ 3 modes : Router> (utilisateur) → Router# (privilégié) → Router(config)# (config)
+
+3️⃣ Sauvegarde : copy running-config startup-config (RAM → NVRAM)
+
+4️⃣ enable secret > enable password (toujours prioritaire)
+
+5️⃣ Astuce : "do [commande]" permet d'exécuter une commande privilégiée depuis conf t
+
+6️⃣ Interface : interface g0/0 → ip address → no shutdown (OBLIGATOIRE)
+
+7️⃣ Chaque interface de routeur = un réseau DIFFERENT
+
+8️⃣ Route statique : ip route [réseau] [masque] [passerelle]
+
+9️⃣ Telnet = port 23 (NON sécurisé) | SSH = port 22 (sécurisé)
+
+🔟 SSH nécessite : hostname + username + domain-name + crypto key generate rsa
