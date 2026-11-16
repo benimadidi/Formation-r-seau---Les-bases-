@@ -1,0 +1,242 @@
+======================================================================
+    📍 ADRESSAGE IP - NOTIONS DE BASE (CCNA 1 - Chapitre 11)
+======================================================================
+
+📋 SOMMAIRE DU CHAPITRE :
+
+   1. Structure de l'adresse IPv4
+   2. Adresses IPv4 : monodiffusion, diffusion, multicast
+   3. Types d'adresses IPv4 (publiques, privées, réservées)
+   4. Segmentation du réseau
+   5. Sous-réseaux d'un réseau IPv4 (préfixe /24)
+
+----------------------------------------------
+🎯 OBJECTIFS DU CHAPITRE
+----------------------------------------------
+
+À la fin de ce chapitre, vous saurez :
+
+   → Décrire la structure d'une adresse IPv4 (partie réseau,
+     partie hôte, masque de sous-réseau)
+   → Comparer les caractéristiques et utilisations des adresses
+     IPv4 de monodiffusion, de diffusion et de multidiffusion
+   → Expliquer les adresses IPv4 publiques, privées et réservées
+   → Expliquer comment la segmentation d'un réseau améliore
+     la communication
+   → Calculer des sous-réseaux IPv4 pour un préfixe /24
+
+----------------------------------------------
+🔢 1. STRUCTURE DE L'ADRESSE IPv4
+----------------------------------------------
+
+🔹 Format d'écriture :
+
+   → Une adresse IP s'écrit : X.X.X.X
+   → 4 blocs de chiffres séparés par des points
+   → Chaque bloc contient un nombre entre 0 et 255
+
+🔹 En binaire (langage réseau) :
+
+   → L'adresse IP s'écrit sur 32 bits
+   → 32 bits = 4 octets (1 octet = 8 bits)
+   → 1 octet par bloc
+
+   ┌─────────────────────────────────────────────────────┐
+   │  8 bits  .  8 bits  .  8 bits  .  8 bits           │
+   │  (octet)    (octet)    (octet)    (octet)           │
+   │  = 32 bits au total                                │
+   └─────────────────────────────────────────────────────┘
+
+🔹 Pourquoi 0 à 255 ?
+
+   → 8 bits = 2⁸ = 256 possibilités
+   → Donc chaque bloc va de 0 à 255
+   → C'est l'information de base à comprendre
+
+🔹 Les 2 parties d'une adresse IP :
+
+   ┌─────────────────────────────────────────────────────┐
+   │          PARTIE RÉSEAU    │    PARTIE HÔTE          │
+   │          (Network)        │    (Host)               │
+   ├───────────────────────────┼─────────────────────────┤
+   │  Commune à tous les       │  Identifie la machine   │
+   │  appareils du même réseau │  de façon unique        │
+   └───────────────────────────┴─────────────────────────┘
+
+🔹 Analogie téléphonique :
+
+   → 06 = mobile, 05 = région sud-ouest, 01 = Île-de-France
+   → Ces préfixes = PARTIE RÉSEAU (commune à un groupe)
+   → Le reste du numéro = PARTIE HÔTE (identifie la personne)
+
+🔹 Règle fondamentale :
+
+   → On commence TOUJOURS par la partie Réseau
+   → On finit TOUJOURS par la partie Hôte
+   → H.N.H.N n'a AUCUN sens
+
+   Seuls 3 cas possibles :
+   → N.H.H.H  (classe A)
+   → N.N.H.H  (classe B)
+   → N.N.N.H  (classe C)
+
+🔹 Exemple concret : 120.135.28.70
+
+   Réponse par défaut (selon la classe) :
+   → 120 commence par 0 en binaire → classe A
+   → Partie réseau = 120
+   → Partie hôte = 135.28.70
+
+   Réponse réelle (selon le masque) :
+   → Dépend du masque de sous-réseau appliqué
+   → On verra cela plus loin
+
+----------------------------------------------
+🏷️ 2. LES CLASSES D'ADRESSES IPv4
+----------------------------------------------
+
+🔹 Historiquement, les adresses étaient regroupées en classes :
+
+   | Classe | Premier(s) bit(s) | Plage décimal   | Structure   |
+   |--------|-------------------|-----------------|-------------|
+   | A      | 0                 | 0 – 127         | N.H.H.H     |
+   | B      | 10                | 128 – 191       | N.N.H.H     |
+   | C      | 110               | 192 – 223       | N.N.N.H     |
+   | D      | 1110              | 224 – 239       | Multicast   |
+   | E      | 11110             | 240 – 255       | Réservé     |
+
+🔹 Comment reconnaître la classe :
+
+   → Une adresse qui commence par 15 → classe A
+   → Une adresse qui commence par 155 → classe B
+   → Une adresse qui commence par 192 → classe C
+
+🔹 ⚠️ Important :
+
+   → Ce système de classes est aujourd'hui PRESQUE ABANDONNÉ
+   → On utilise maintenant le CIDR et les masques variables
+   → Mais il faut le connaître pour l'examen CCNA
+
+----------------------------------------------
+📡 3. ADRESSES IPv4 : MONODIFFUSION, DIFFUSION, MULTICAST
+----------------------------------------------
+
+🔹 MONODIFFUSION (Unicast) :
+
+   → Envoi à UN SEUL destinataire
+   → C'est le type le plus courant
+   → Exemple : 192.168.1.10 → une seule machine
+
+🔹 DIFFUSION (Broadcast) :
+
+   → Envoi à TOUS les hôtes du réseau
+   → Deux façons de la faire :
+
+   ① Diffusion dirigée (broadcast dirigé) :
+      → Mettre tous les bits de la partie hôte à 1
+      → Exemples :
+         • 192.168.1.255   (classe C)
+         • 172.16.255.255  (classe B)
+         • 20.255.255.255  (classe A)
+      → Peut sortir du réseau pour diffuser dans un autre réseau
+
+   ② Diffusion limitée (broadcast local) :
+      → Adresse 255.255.255.255 (4x255)
+      → Reste dans le réseau local
+      → Le routeur la BLOQUE
+      → C'est la limite d'un domaine de diffusion
+
+🔹 MULTICAST (Multidiffusion) :
+
+   → Envoi à PLUSIEURS hôtes à la fois
+   → Mais PAS à tous les hôtes
+   → On envoie à un GROUPE d'utilisateurs
+   → Utilise les adresses de classe D
+   → Plage : 224.0.0.0 → 239.255.255.255
+
+🔹 Récapitulatif :
+
+   | Type          | Destinataires        | Plage / Exemple        |
+   |---------------|----------------------|------------------------|
+   | Unicast       | 1 seul               | 192.168.1.10           |
+   | Broadcast     | Tous du réseau       | 192.168.1.255          |
+   | Multicast     | Un groupe            | 224.0.0.0 – 239.255.255.255 |
+
+----------------------------------------------
+🌍 4. TYPES D'ADRESSES IPv4
+----------------------------------------------
+
+🔹 Adresses PUBLIQUES :
+
+   → Accessibles sur Internet
+   → Uniques au monde
+   → Attribuées par les fournisseurs d'accès (FAI)
+   → Exemple : 8.8.8.8 (Google DNS)
+
+🔹 Adresses PRIVÉES :
+
+   → Réservées aux réseaux internes
+   → Non routables sur Internet
+   → Définies par la RFC 1918 :
+
+   | Classe | Plage d'adresses privées              | Masque         |
+   |--------|---------------------------------------|----------------|
+   | A      | 10.0.0.0    – 10.255.255.255          | 255.0.0.0      |
+   | B      | 172.16.0.0  – 172.31.255.255          | 255.240.0.0    |
+   | C      | 192.168.0.0 – 192.168.255.255         | 255.255.0.0    |
+
+🔹 Adresses RÉSERVÉES :
+
+   → Adresse de réseau : tous les bits hôte à 0
+     Exemple : 192.168.1.0
+   → Adresse de broadcast : tous les bits hôte à 1
+     Exemple : 192.168.1.255
+   → Adresse de bouclage (loopback) : 127.0.0.1
+   → Adresse 0.0.0.0 : réseau par défaut
+   → Classe E (240.0.0.0 – 255.255.255.254) : réservée
+     pour la recherche et le développement d'Internet
+
+🔹 Nombre d'adresses utilisables :
+
+   → Total théorique : 2³² = 4 milliards d'adresses
+   → Adresses réellement utilisables : ~2,8 milliards
+   → Raison : adresses réseau, broadcast, réservées
+
+🔹 Pour un réseau, on a toujours :
+
+   → 256 – 2 = 254 adresses utilisables (pour un /24)
+   → Première adresse utilisable : X.X.X.1
+   → Dernière adresse utilisable : X.X.X.254
+
+   Exemple classe B : 172.16.0.0
+   → Première utilisable : 172.16.0.1
+   → Dernière utilisable : 172.16.255.254
+
+
+----------------------------------------------
+📌 À RETENIR
+----------------------------------------------
+
+1️⃣ Une adresse IPv4 = 32 bits = 4 octets = X.X.X.X
+   → Chaque bloc va de 0 à 255 (2⁸ = 256 possibilités)
+
+2️⃣ Une adresse IP se compose de 2 parties :
+   → Partie RÉSEAU (commune au réseau)
+   → Partie HÔTE (identifie la machine)
+   → Toujours N avant H (N.H.H.H, N.N.H.H, N.N.N.H)
+
+3️⃣ Classes historiques :
+   → A : 0–127    (N.H.H.H)
+   → B : 128–191  (N.N.H.H)
+   → C : 192–223  (N.N.N.H)
+   → D : 224–239  (multicast)
+   → E : 240–255  (réservé)
+
+4️⃣ Trois types de communication :
+   → Unicast    = 1 destinataire
+   → Broadcast  = tous les hôtes du réseau
+   → Multicast  = un groupe d'hôtes (classe D)
+
+5️⃣ Total des adresses IPv4 :
+   → 4 milliards théoriques
+   → ~2,8 milliards utilisables
