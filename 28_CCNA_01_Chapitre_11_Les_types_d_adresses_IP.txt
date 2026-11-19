@@ -1,0 +1,404 @@
+======================================================================
+    🌐 LES TYPES D'ADRESSES IP (CCNA 1 - Chapitre 11)
+======================================================================
+
+📋 SOMMAIRE DE LA LEÇON :
+
+   1. Le problème : la pénurie d'adresses IPv4
+   2. Qui distribue les adresses IP ? (IANA et RIR)
+   3. Les adresses privées (RFC 1918)
+   4. Adresse privée vs adresse publique (démo ipconfig)
+   5. NAT et PAT (NAT surchargé)
+   6. Les adresses spéciales : bouclage et link-local (APIPA)
+   7. Récapitulatif : quelle adresse pour quelle portée ?
+   8. La segmentation du réseau
+   9. Exemple : découper un /24 en sous-réseaux
+
+----------------------------------------------
+🎯 OBJECTIFS DE LA LEÇON
+----------------------------------------------
+
+À la fin de cette leçon, vous saurez :
+
+   → Expliquer pourquoi on a inventé les adresses privées
+   → Citer les 3 plages privées de la RFC 1918
+   → Différencier adresse privée et adresse publique
+   → Expliquer le principe du NAT et du PAT
+   → Reconnaître les adresses de bouclage (127.x) et
+     link-local / APIPA (169.254.x)
+   → Expliquer l'intérêt de la segmentation
+   → Calculer combien de bits emprunter pour créer N sous-réseaux
+
+----------------------------------------------
+⚠️ 1. LE PROBLÈME : LA PÉNURIE D'ADRESSES IPv4
+----------------------------------------------
+
+🔹 Rappel des chiffres :
+
+   → ~4 milliards d'adresses IPv4 au total (2³²)
+   → ~2,8 milliards réellement utilisables
+   → Aujourd'hui : plus de 20 milliards d'appareils connectés
+   → 2,8 milliards < 20 milliards → ça ne suffit pas
+
+🔹 Les solutions inventées pour faire « survivre » l'IPv4 :
+
+   → Abandon des classes A/B/C au profit des masques (CIDR)
+   → Les adresses privées (RFC 1918)
+   → Le NAT, puis le PAT
+
+🔹 Règle de base :
+
+   → Une adresse IP = un identifiant UNIQUE sur un réseau
+   → Comme un numéro de téléphone : deux personnes ne
+     peuvent pas avoir le même
+   → Si 4 réseaux isolés utilisent tous 10.0.0.0/24, aucun
+     problème... tant qu'ils ne communiquent pas entre eux
+
+----------------------------------------------
+🏛️ 2. QUI DISTRIBUE LES ADRESSES IP ?
+----------------------------------------------
+
+🔹 On ne choisit pas librement son adresse sur Internet :
+   un organisme mondial gère l'attribution → l'IANA
+
+🔹 L'IANA délègue à des registres régionaux (RIR) :
+
+   | RIR       | Zone couverte                              |
+   |-----------|--------------------------------------------|
+   | ARIN      | Amérique du Nord                           |
+   | AFRINIC   | Afrique                                    |
+   | RIPE NCC  | Europe (Russie comprise), Moyen-Orient     |
+   | APNIC     | Asie-Pacifique (Australie, Asie du Sud...) |
+   | LACNIC    | Amérique latine et Caraïbes                |
+
+🔹 La chaîne de distribution :
+
+   IANA → RIR → Opérateurs / FAI (ISP) → Utilisateurs
+
+   → En France, les FAI : SFR, Free, Bouygues, Orange...
+
+🔹 Le principe du « prêt » d'adresses :
+
+   → L'opérateur attribue un petit lot d'adresses publiques
+     (ex. : 5 adresses) à une entreprise de 50, 100, 200
+     personnes
+   → Chaque fois qu'un utilisateur sort sur Internet, il
+     « emprunte » une de ces adresses (on les fait tourner)
+   → En interne, l'entreprise fait ce qu'elle veut...
+     à condition d'utiliser les plages privées
+
+----------------------------------------------
+🔒 3. LES ADRESSES PRIVÉES (RFC 1918)
+----------------------------------------------
+
+🔹 Les 3 plages réservées à l'usage privé :
+
+   | Plage CIDR       | De             | À                 |
+   |------------------|----------------|-------------------|
+   | 10.0.0.0/8       | 10.0.0.0       | 10.255.255.255    |
+   | 172.16.0.0/12    | 172.16.0.0     | 172.31.255.255    |
+   | 192.168.0.0/16   | 192.168.0.0    | 192.168.255.255   |
+
+🔹 Pourquoi 172.16 s'arrête à 172.31 ? (rappel leçon 27)
+
+   → /12 = 8 bits + 4 bits dans le 2e octet
+   → 2e octet : 0001 | 0000 (16) → 0001 | 1111 (31)
+   → Donc de 172.16.0.0 à 172.31.255.255
+
+🔹 Définition :
+
+   → Une adresse privée est une adresse qui n'a PAS le droit
+     d'aller sur Internet (non routable sur Internet)
+   → Les tables de routage d'Internet ne contiennent JAMAIS
+     les réseaux 10.x, 172.16-31.x, 192.168.x
+   → Une requête vers 10.x envoyée sur Internet n'aboutit pas
+
+🔹 Dans son entreprise, on fait ce qu'on veut avec :
+
+   → 10.x.x.x (n'importe quels chiffres après)
+   → 172.16.x.x à 172.31.x.x (sans dépasser 31)
+   → 192.168.x.x
+
+🔹 ⚠️ Privé ≠ seulement LAN :
+
+   → Une entreprise avec un site à Paris et un à Lyon peut
+     utiliser des adresses privées sur les deux sites
+   → Rappel : le WAN (interconnexion de LAN) n'est PAS
+     Internet
+   → Les adresses privées passent sur le LAN et le WAN,
+     mais JAMAIS sur Internet
+
+----------------------------------------------
+🔍 4. ADRESSE PRIVÉE VS ADRESSE PUBLIQUE
+----------------------------------------------
+
+🔹 Démonstration :
+
+   → Dans le CMD : ipconfig
+     → Adresse affichée : 192.168.1.19 → adresse PRIVÉE
+   → Sur Google : « what's my IP address »
+     → Adresse affichée totalement différente → adresse
+       PUBLIQUE (celle prêtée par l'opérateur)
+
+🔹 Bilan :
+
+   | Adresse privée                  | Adresse publique                  |
+   |---------------------------------|-----------------------------------|
+   | Utilisée à l'intérieur du réseau| Utilisée pour sortir sur Internet |
+   | Choisie librement (RFC 1918)    | Attribuée par l'opérateur (FAI)   |
+   | Non routable sur Internet       | Routable sur Internet             |
+   | Ex. : 192.168.1.19              | Ex. : 88.47.145.8 (fictif)        |
+
+----------------------------------------------
+🔄 5. NAT ET PAT
+----------------------------------------------
+
+🔹 NAT (Network Address Translation) :
+
+   → Le routeur remplace l'adresse privée par une adresse
+     publique quand le paquet sort sur Internet
+   → Problème : une seule adresse publique ne suffit pas
+     pour une entreprise de 3 000 salariés
+
+🔹 PAT (Port Address Translation) = NAT surchargé :
+
+   → Option supplémentaire du NAT
+   → Utilisé dans 99 % des cas aujourd'hui
+   → Idée : on ajoute un NUMÉRO DE PORT à l'adresse publique
+
+🔹 Rappel : Internet = réseau TCP/IP → 2 adressages
+
+   → Adresse IP (couche 3) : quelle machine ?
+   → Port (couche 4) : quelle application ?
+     • HTTP = 80, HTTPS = 443, FTP = 21, DNS = 53...
+   → Ports 0 à 1023 : réservés aux protocoles connus
+   → Ports 1024 à 65535 : libres, attribuables à tous
+
+🔹 Exemple (adresses fictives) :
+
+   PC1 : 192.168.1.1 → Google (port 443)
+      → traduit en 72.158.25.33 : 15000
+
+   PC2 : 192.168.1.2 → Twitter (port 443)
+      → traduit en 72.158.25.33 : 17000
+
+   → Même adresse publique, mais port SOURCE différent
+
+🔹 Au retour :
+
+   → Google répond à 72.158.25.33 : 15000
+   → Le routeur consulte sa table NAT :
+     port 15000 → c'est PC1 (192.168.1.1)
+   → Twitter répond à 72.158.25.33 : 17000
+     → port 17000 → c'est PC2 (192.168.1.2)
+
+   ✅ Avec UNE seule adresse publique, on gère toute une
+      entreprise
+
+🔹 Conséquence :
+
+   → Grâce au PAT, l'IPv4 survit depuis des années
+   → C'est aussi pour ça que l'IPv6 ne domine toujours pas
+
+----------------------------------------------
+🔁 6. LES ADRESSES SPÉCIALES
+----------------------------------------------
+
+🔹 ADRESSE DE BOUCLAGE (Loopback) :
+
+   → Réseau 127.0.0.0/8 (le fameux « localhost »)
+   → Adresse la plus connue : 127.0.0.1
+   → Désigne la carte réseau de la machine elle-même
+   → Ne sort JAMAIS de la carte réseau
+   → Test : ping 127.0.0.1 → répond, on ne pinge que
+     sa propre machine
+
+🔹 ADRESSE LINK-LOCAL (APIPA chez Microsoft) :
+
+   → Réseau 169.254.0.0/16
+   → « APIPA » = nom donné par Microsoft
+   → « Link-local » = nom utilisé chez Cisco
+   → Même chose, deux noms
+
+🔹 Fonctionnement de l'APIPA :
+
+   ① Le PC envoie une requête DHCP (DHCP Discover)
+   ② Pas de serveur DHCP → aucune réponse
+   ③ Windows s'attribue lui-même une adresse en 169.254.x.x
+      (ex. : 169.254.1.1)
+   ④ Il envoie une diffusion : « quelqu'un a-t-il déjà
+      169.254.1.1 ? »
+   ⑤ Personne ne répond → il la garde
+      Quelqu'un l'a déjà → il en prend une autre (169.254.1.2)
+
+   → Des PC branchés sur un même switch, sans DHCP,
+     peuvent ainsi communiquer entre eux
+   → Ces adresses ne passent JAMAIS un routeur
+
+   💡 Si votre PC affiche 169.254.x.x, c'est qu'il n'a pas
+      obtenu d'adresse du serveur DHCP
+
+----------------------------------------------
+🗺️ 7. RÉCAPITULATIF : QUELLE ADRESSE, QUELLE PORTÉE ?
+----------------------------------------------
+
+   ┌──────────────────────────────────────────────────┐
+   │ INTERNET  → Adresses PUBLIQUES (attribuées FAI)  │
+   │  ┌────────────────────────────────────────────┐  │
+   │  │ WAN   → Adresses PRIVÉES (RFC 1918)        │  │
+   │  │  ┌──────────────────────────────────────┐  │  │
+   │  │  │ LAN  → Link-local / APIPA 169.254.x  │  │  │
+   │  │  │  ┌────────────────────────────────┐  │  │  │
+   │  │  │  │ LOCAL (machine) → 127.x        │  │  │  │
+   │  │  │  └────────────────────────────────┘  │  │  │
+   │  │  └──────────────────────────────────────┘  │  │
+   │  └────────────────────────────────────────────┘  │
+   └──────────────────────────────────────────────────┘
+
+   | Type         | Plage            | Va jusqu'où ?            |
+   |--------------|------------------|--------------------------|
+   | Bouclage     | 127.0.0.0/8      | Reste dans la machine    |
+   | Link-local   | 169.254.0.0/16   | Réseau local (LAN)       |
+   | Privée       | RFC 1918         | LAN + WAN, pas Internet  |
+   | Publique     | Toutes les autres| Internet                 |
+
+----------------------------------------------
+✂️ 8. LA SEGMENTATION DU RÉSEAU
+----------------------------------------------
+
+🔹 Définition :
+
+   → Couper un grand réseau en petits réseaux
+     (sous-réseaux)
+
+🔹 Le problème d'un grand réseau :
+
+   → 2 000 utilisateurs sur le même réseau
+   → Chaque diffusion (broadcast) touche les 2 000 machines
+   → Trafic inutile → perte de bande passante, de qualité,
+     de sécurité
+
+🔹 Le routeur = limite du domaine de diffusion :
+
+   → Il reçoit la diffusion sur l'interface du réseau local
+   → Il ne la transmet JAMAIS sur ses autres interfaces
+
+🔹 Avantages de la segmentation :
+
+   → Limite les domaines de diffusion
+     (25 machines touchées au lieu de 300)
+   → Facilite la gestion du réseau
+   → Facilite l'application de politiques de sécurité
+     par équipe/département
+   → Renforce la sécurité : on ne diffuse pas vers les
+     autres sous-réseaux
+
+🔹 Principe parent / enfants :
+
+   → Une adresse « parent » (ex. 192.168.1.0/24)
+   → Découpée en plusieurs sous-réseaux « enfants »
+   → Vers l'opérateur, on n'annonce que l'adresse parent
+
+----------------------------------------------
+🧮 9. EXEMPLE : DÉCOUPER UN /24 EN SOUS-RÉSEAUX
+----------------------------------------------
+
+🔹 Énoncé :
+
+   → Adresse : 192.168.1.0/24
+   → Besoin : 6 sous-réseaux (6 départements)
+
+🔹 Étape 1 – Où emprunter les bits ?
+
+   → La partie réseau (/24) est « sacrée » : on n'y touche pas
+   → On emprunte dans la partie HÔTE (dernier octet)
+   → Toujours à GAUCHE (le réseau vient avant les hôtes)
+
+🔹 Étape 2 – Combien de bits emprunter ?
+
+   → Formule : 2ⁿ ≥ nombre de réseaux voulus
+
+      2¹ = 2   → pas assez
+      2² = 4   → pas assez
+      2³ = 8   → ≥ 6 ✅
+
+   → On emprunte 3 bits → on peut créer 8 sous-réseaux
+
+   💡 Autre exemple : 70 réseaux → 2⁶ = 64 ne suffit pas
+      → 2⁷ = 128 ✅ → 7 bits
+
+   ⚠️ Pour compter les RÉSEAUX, on ne retire pas 2
+      (le −2 ne s'applique qu'aux HÔTES)
+
+🔹 Étape 3 – Le nouveau masque :
+
+   → 24 + 3 = /27
+   → 255.255.255.224
+
+🔹 Étape 4 – Les sous-réseaux :
+
+   Dernier octet : [3 bits réseau | 5 bits hôte]
+
+   → 5 bits hôte = 2⁵ = 32 adresses par sous-réseau
+   → 32 − 2 = 30 adresses utilisables
+
+   | N° | Bits | Réseau          | Plage utilisable  | Diffusion        |
+   |----|------|-----------------|-------------------|------------------|
+   | 1  | 000  | 192.168.1.0     | .1   → .30        | 192.168.1.31     |
+   | 2  | 001  | 192.168.1.32    | .33  → .62        | 192.168.1.63     |
+   | 3  | 010  | 192.168.1.64    | .65  → .94        | 192.168.1.95     |
+   | 4  | 011  | 192.168.1.96    | .97  → .126       | 192.168.1.127    |
+   | 5  | 100  | 192.168.1.128   | .129 → .158       | 192.168.1.159    |
+   | 6  | 101  | 192.168.1.160   | .161 → .190       | 192.168.1.191    |
+   | 7  | 110  | 192.168.1.192   | .193 → .222       | 192.168.1.223    |
+   | 8  | 111  | 192.168.1.224   | .225 → .254       | 192.168.1.255    |
+
+   → Masque identique pour tous : /27 = 255.255.255.224
+   → Les sous-réseaux 7 et 8 sont en réserve pour l'avenir
+
+   (La vidéo détaille les sous-réseaux 1 et 5 ; les autres
+    lignes sont laissées en exercice. À refaire vous-même
+    pour vérifier)
+
+🔹 Exemple détaillé – sous-réseau n°5 :
+
+   → Bits réseau : 100 → 128 → réseau 192.168.1.128
+   → Diffusion : 100 | 11111 → 128 + 31 = 159
+   → Astuce : 5 bits hôte à 1 = 31 (32 − 1)
+   → Utilisateurs : 192.168.1.129 → 192.168.1.158
+
+🔹 Rappel calcul du masque /27 :
+
+   → 128 → +64 = 192 → +32 = 224
+
+
+----------------------------------------------
+📌 À RETENIR
+----------------------------------------------
+
+1️⃣ IPv4 = ~4 milliards d'adresses, bien moins que les
+   20+ milliards d'appareils → il a fallu des solutions
+
+2️⃣ Distribution : IANA → RIR (ARIN, AFRINIC, RIPE NCC,
+   APNIC, LACNIC) → FAI → utilisateurs
+
+3️⃣ Adresses privées (RFC 1918) :
+   → 10.0.0.0/8
+   → 172.16.0.0/12 (jusqu'à 172.31.255.255)
+   → 192.168.0.0/16
+   → Jamais routées sur Internet (LAN + WAN uniquement)
+
+4️⃣ NAT = privée → publique
+   PAT = NAT surchargé : une adresse publique + des ports
+   différents → toute une entreprise derrière une seule IP
+
+5️⃣ Adresses spéciales :
+   → 127.0.0.0/8   = bouclage (localhost, 127.0.0.1)
+   → 169.254.0.0/16 = link-local / APIPA (pas de DHCP)
+
+6️⃣ Segmentation : petits réseaux = petits domaines de
+   diffusion, meilleure sécurité et gestion
+   → Le routeur est la limite du domaine de diffusion
+
+7️⃣ Créer N sous-réseaux : emprunter n bits avec 2ⁿ ≥ N
+   → Hôtes par sous-réseau : 2^(bits hôte) − 2
