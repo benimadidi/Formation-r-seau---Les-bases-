@@ -1,0 +1,368 @@
+======================================================================
+    🚚 LA COUCHE TRANSPORT (CCNA 1 - Chapitre 14)
+======================================================================
+
+📋 SOMMAIRE DE LA LEÇON :
+
+   1. Rôle de la couche transport
+   2. TCP vs UDP : fiabilité ou rapidité
+   3. Quel protocole pour quel usage ?
+   4. L'en-tête TCP
+   5. L'en-tête UDP
+   6. Les numéros de port (3e type d'adressage)
+   7. Les 3 catégories de ports et les ports à connaître
+   8. Voir ses connexions : netstat
+   9. Le processus de communication TCP
+   10. MSS : la taille maximale d'un segment
+   11. La fenêtre TCP et la reprise des pertes
+
+----------------------------------------------
+🎯 OBJECTIFS DE LA LEÇON
+----------------------------------------------
+
+À la fin de cette leçon, vous saurez :
+
+   → Expliquer le rôle de la couche transport
+   → Comparer TCP et UDP
+   → Expliquer à quoi servent les numéros de port
+   → Décrire l'ouverture (three-way handshake) et la
+     fermeture d'une session TCP
+   → Expliquer la fiabilité et le contrôle de flux TCP
+
+   💡 Chapitre dense et théorique, mais essentiel, surtout
+      pour la cybersécurité : beaucoup d'attaques reposent
+      sur les sessions TCP et UDP
+
+----------------------------------------------
+🧭 1. RÔLE DE LA COUCHE TRANSPORT
+----------------------------------------------
+
+🔹 Rappel du modèle OSI :
+
+   7 Application   ┐
+   6 Présentation  ├ prochain chapitre
+   5 Session       ┘
+   4 TRANSPORT     ← ce chapitre (TCP, UDP)
+   3 Réseau        ✅ vu (IPv4, IPv6, ICMP)
+   2 Liaison       ✅ vu
+   1 Physique      ✅ vu
+
+🔹 Rôle :
+
+   → Gère la communication LOGIQUE entre les applications
+     de deux hôtes (de bout en bout)
+   → Fait le lien entre la couche application et les
+     couches inférieures
+
+🔹 L'analogie de la poste :
+
+   → Avant d'envoyer un colis, on choisit le bon carton,
+     on prépare, on écrit les adresses...
+   → La couche transport « prépare les données au transport »
+
+🔹 En un mot : la SEGMENTATION
+
+   → Les données des applications (page web, musique,
+     mail...) sont découpées en petits morceaux = SEGMENTS
+   → Chaque segment reçoit un numéro de séquence
+   → À l'arrivée, les segments sont réassemblés
+
+----------------------------------------------
+⚖️ 2. TCP VS UDP
+----------------------------------------------
+
+   | Critère                    | TCP                 | UDP               |
+   |----------------------------|---------------------|-------------------|
+   | Connexion                  | Avec session (état) | Sans session      |
+   | Numérotation des segments  | ✅                  | ❌               |
+   | Accusés de réception (ACK) | ✅                  | ❌               |
+   | Renvoi des données perdues | ✅                  | ❌               |
+   | Remise dans l'ordre        | ✅                  | ❌               |
+   | Taille de l'en-tête        | 20 octets           | 8 octets          |
+   | Point fort                 | FIABILITÉ           | RAPIDITÉ          |
+
+🔹 Exemple TCP : on envoie les segments 1 2 3 4 5 6
+
+   → Reçus : 1 2 5 4 6 (le 3 est perdu, l'ordre est faux)
+   → TCP détecte la perte → renvoie le 3
+   → TCP remet dans l'ordre → 1 2 3 4 5 6 ✅
+
+🔹 Exemple UDP : même situation
+
+   → Le 3 est perdu ? Tant pis
+   → L'ordre est faux ? Tant pis
+
+🔹 ⚠️ Idée reçue :
+
+   → « UDP est un vieux protocole remplacé par TCP » : FAUX
+   → Les deux existent car ils répondent à des besoins
+     différents
+
+----------------------------------------------
+🎯 3. QUEL PROTOCOLE POUR QUEL USAGE ?
+----------------------------------------------
+
+🔹 TCP → quand la fiabilité compte plus que le temps
+
+   → Ouvrir une page web, télécharger un fichier, envoyer
+     un mail : attendre 1 à 3 secondes n'est pas grave
+   → HTTP/HTTPS, SMTP (mail), FTP (fichiers), SSH...
+   → C'est pour ça qu'on parle de « pile TCP/IP » : la
+     quasi-totalité d'Internet repose sur TCP + IP
+
+🔹 UDP → quand il faut du TEMPS RÉEL ou de la simplicité
+
+   → Appel téléphonique, vidéo, IPTV, streaming : impossible
+     de s'arrêter pour récupérer un pixel perdu
+     (imaginez une finale de Ligue des champions qui se fige)
+   → Requêtes simples question/réponse :
+     • DHCP
+     • DNS
+     • TFTP (Trivial FTP : petits fichiers)
+     • SNMP (supervision du réseau)
+     • VoIP, communications satellites, faible débit
+
+----------------------------------------------
+📄 4. L'EN-TÊTE TCP (20 octets)
+----------------------------------------------
+
+   | Champ                         | Rôle                                    |
+   |-------------------------------|-----------------------------------------|
+   | Port source (16 bits)         | Application émettrice                   |
+   | Port destination (16 bits)    | Application destinataire                |
+   | Numéro de séquence (32 bits)  | Remettre les segments dans l'ordre      |
+   | Numéro d'accusé (32 bits)     | Confirmer la réception (ACK)            |
+   | Longueur d'en-tête            | Où commence/finit l'en-tête             |
+   | Réservé                       | Non utilisé                             |
+   | Bits de contrôle (6 bits)     | Nature du segment (voir ci-dessous)     |
+   | Taille de fenêtre (16 bits)   | Quantité envoyable avant un ACK         |
+   | Somme de contrôle (checksum)  | Détection d'erreurs                     |
+   | Urgent                        | Données urgentes                        |
+   | Options                       | Options facultatives                    |
+
+🔹 Les 6 bits de contrôle :
+
+   | Bit | Signification                            |
+   |-----|------------------------------------------|
+   | URG | Données urgentes                         |
+   | ACK | Accusé de réception                      |
+   | PSH | Push : transmettre tout de suite         |
+   | RST | Reset : réinitialiser la connexion       |
+   | SYN | Synchronisation : ouvrir une session     |
+   | FIN | Fin : fermer une session                 |
+
+   → Les plus importants : SYN, ACK, FIN
+
+----------------------------------------------
+📄 5. L'EN-TÊTE UDP (8 octets)
+----------------------------------------------
+
+   | Champ                  | Taille   |
+   |------------------------|----------|
+   | Port source            | 16 bits  |
+   | Port destination       | 16 bits  |
+   | Longueur               | 16 bits  |
+   | Somme de contrôle      | 16 bits  |
+
+   → Pas de séquence, pas d'ACK, pas de fenêtre
+   → UDP n'assure aucune des fonctions de fiabilité de TCP
+
+----------------------------------------------
+🔢 6. LES NUMÉROS DE PORT
+----------------------------------------------
+
+🔹 Les 3 types d'adressage vus dans la formation :
+
+   | Adressage   | Couche | Rôle                                    |
+   |-------------|--------|-----------------------------------------|
+   | MAC         | 2      | Entre équipements d'un même réseau      |
+   |             |        | (dans le bureau de poste)               |
+   | IP          | 3      | Entre réseaux différents                |
+   |             |        | (entre les bureaux de poste)            |
+   | PORT        | 4      | Entre APPLICATIONS                      |
+   |             |        | (de quelle application s'agit-il ?)     |
+
+🔹 Principe :
+
+   → Les flux qui viennent des applications sont regroupés
+     par type d'application
+   → Chaque type reçoit un numéro : 443 pour le web
+     sécurisé, 25 pour le mail, 22 pour SSH...
+   → Le port s'applique à TCP comme à UDP
+
+🔹 HTTPS = HTTP + une couche de sécurité (chiffrement)
+   → Aujourd'hui, le web passe presque entièrement en HTTPS
+
+----------------------------------------------
+🗂️ 7. CATÉGORIES DE PORTS ET PORTS À CONNAÎTRE
+----------------------------------------------
+
+   | Catégorie              | Plage            | Usage                        |
+   |------------------------|------------------|------------------------------|
+   | Ports réservés         | 0 → 1023         | Protocoles Internet connus,  |
+   | (bien connus)          |                  | fixés par l'IANA             |
+   | Ports enregistrés      | 1024 → 49151     | Applications d'éditeurs ou   |
+   | (inscrits)             |                  | les vôtres                   |
+   | Ports privés           | 49152 → 65535    | Attribués dynamiquement par  |
+   | (dynamiques)           |                  | le système (port source)     |
+
+   → On ne peut pas prendre un port réservé pour sa propre
+     application ; on prend un port enregistré
+
+🔹 Ports à connaître :
+
+   | Port     | Protocole   | Transport | Usage                         |
+   |----------|-------------|-----------|-------------------------------|
+   | 20 / 21  | FTP         | TCP       | Transfert de fichiers         |
+   | 22       | SSH         | TCP       | Accès distant SÉCURISÉ        |
+   | 23       | Telnet      | TCP       | Accès distant (non sécurisé)  |
+   | 25       | SMTP        | TCP       | Envoi de mails                |
+   | 49       | TACACS+     | TCP       | Authentification (Cisco)      |
+   | 53       | DNS         | UDP/TCP   | Résolution de noms            |
+   | 67 / 68  | DHCP        | UDP       | Attribution d'adresses        |
+   | 69       | TFTP        | UDP       | Petits fichiers               |
+   | 80       | HTTP        | TCP       | Web                           |
+   | 161      | SNMP        | UDP       | Supervision                   |
+   | 443      | HTTPS       | TCP       | Web sécurisé                  |
+
+   💡 Inutile de tout apprendre par cœur : chercher
+      « liste des ports logiciels » (page Wikipédia)
+
+----------------------------------------------
+🖥️ 8. VOIR SES CONNEXIONS : NETSTAT
+----------------------------------------------
+
+   C:\> netstat
+
+   → Affiche les sessions TCP ouvertes sur la machine
+   → Exemple : 192.168.1.19:50xxx → serveur:443
+     • 192.168.1.19 = mon adresse privée
+     • 50xxx = port source dynamique
+     • 443 = HTTPS (une page web ouverte en arrière-plan)
+
+----------------------------------------------
+🤝 9. LE PROCESSUS DE COMMUNICATION TCP
+----------------------------------------------
+
+🔹 3 grandes étapes (TCP uniquement) :
+
+   ① Ouverture de session (three-way handshake)
+   ② Acheminement des données
+   ③ Fermeture de session
+
+🔹 ① Ouverture : la poignée de main en 3 temps
+
+   Émetteur                      Destinataire
+      │──────── SYN ──────────────▶│  « on ouvre ? »
+      │◀────── SYN + ACK ──────────│  « OK, reçu »
+      │──────── ACK ──────────────▶│  « j'ai bien reçu ton OK »
+      │                            │
+      │     Session établie → envoi des données
+
+   → Pendant l'ouverture, on négocie notamment la taille
+     de fenêtre
+   → À connaître parfaitement : beaucoup d'attaques
+     (cybersécurité) exploitent ce mécanisme
+
+🔹 ③ Fermeture : 4 échanges
+
+   Émetteur                      Destinataire
+      │──────── FIN ──────────────▶│
+      │◀─────── ACK ───────────────│
+      │◀─────── FIN ───────────────│
+      │──────── ACK ──────────────▶│
+
+   💬 « TCP est un protocole parano » : il demande un
+      accusé pour tout → plus de données, plus de débit,
+      plus de temps
+
+----------------------------------------------
+📏 10. MSS : TAILLE MAXIMALE D'UN SEGMENT
+----------------------------------------------
+
+🔹 MSS = Maximum Segment Size
+
+   → En IPv4, par défaut : 1 460 octets
+
+🔹 Le calcul :
+
+   MTU Ethernet           1 500 octets
+   − en-tête IP              20 octets
+   − en-tête TCP             20 octets
+   ─────────────────────────────────
+   = MSS                  1 460 octets
+
+----------------------------------------------
+🪟 11. LA FENÊTRE TCP ET LA REPRISE DES PERTES
+----------------------------------------------
+
+🔹 Taille de fenêtre (window) :
+
+   → Quantité de données que l'émetteur peut envoyer avant
+     de devoir recevoir un accusé de réception
+   → Il existe aussi un délai d'attente : sans ACK, la
+     session finit par expirer
+
+🔹 Exemple (chiffres arrondis) :
+   fenêtre = 3 000 octets, segments de 1 500 octets
+
+   ① SEQ 1    (1 500 octets)   → reçu
+   ② SEQ 1501 (1 500 octets)   → reçu (3 000 au total)
+      ← ACK 3001 : « j'ai tout reçu jusqu'à 3 000,
+                    j'attends le 3 001 »
+
+   ③ SEQ 3001 (1 500 octets)   → ❌ PERDU
+   ④ SEQ 4501 (1 500 octets)   → reçu
+      ← ACK 3001 : « il me manque le segment 3 001 »
+        (fenêtre ramenée à 1 500 dans l'explication du
+         formateur pour signaler qu'il n'en manque qu'un)
+
+   ⑤ L'émetteur renvoie SEQ 3001  → reçu
+      ← ACK 6001 : « tout reçu jusqu'à 6 000 »
+        (la fenêtre revient à 3 000)
+
+   ⑥ La suite continue (SEQ 6001, 7501...)
+   ⑦ Le destinataire remet les segments dans l'ordre :
+      1 → 1501 → 3001 → 4501 → ...
+
+   💡 Le numéro d'ACK = prochain octet attendu
+      (dernier octet reçu + 1)
+
+   ⚠️ Simplification : en réalité TCP signale une perte par
+      des ACK répétés (ACK dupliqués) ou par l'option SACK
+      (accusé sélectif). Le principe à retenir est le même :
+      seul le segment manquant est renvoyé
+
+🔹 Et UDP dans tout ça ?
+
+   → Il ne fait rien de tout cela : ports source et
+     destination, création du segment, envoi
+   → D'où sa rapidité
+
+
+----------------------------------------------
+📌 À RETENIR
+----------------------------------------------
+
+1️⃣ Couche transport = segmentation + communication entre
+   applications (TCP et UDP)
+
+2️⃣ TCP = fiable (séquence, ACK, renvoi, ordre), en-tête
+   20 octets → web, mail, FTP, SSH
+
+3️⃣ UDP = rapide, sans garantie, en-tête 8 octets
+   → voix, vidéo, DNS, DHCP, TFTP, SNMP
+
+4️⃣ Port = adressage des applications
+   → 0-1023 réservés, 1024-49151 enregistrés,
+     49152-65535 dynamiques
+
+5️⃣ Ouverture TCP : SYN → SYN-ACK → ACK
+   Fermeture TCP : FIN → ACK → FIN → ACK
+
+6️⃣ Bits de contrôle : URG, ACK, PSH, RST, SYN, FIN
+
+7️⃣ MSS = 1 500 − 20 (IP) − 20 (TCP) = 1 460 octets
+
+8️⃣ Fenêtre = quantité envoyée avant un ACK ;
+   ACK = numéro du prochain octet attendu
