@@ -1,0 +1,301 @@
+======================================================================
+    🔐 LA FONCTIONNALITÉ AUTOSECURE (CCNA 1 - Chapitre 16)
+======================================================================
+
+📋 SOMMAIRE DE LA LEÇON :
+
+   1. La topologie du lab
+   2. Rappel : les bases de la sécurisation d'un routeur
+   3. Pourquoi désactiver les services inutiles ?
+   4. Cisco AutoSecure : le principe
+   5. AutoSecure pas à pas (les questions posées)
+   6. Les commandes insérées par AutoSecure
+   7. Finaliser SSH à la main
+   8. Récapitulatif des commandes
+
+----------------------------------------------
+🎯 OBJECTIFS DE LA LEÇON
+----------------------------------------------
+
+À la fin de cette leçon, vous saurez :
+
+   → Lancer AutoSecure sur un routeur Cisco
+   → Répondre à ses questions interactives
+   → Comprendre les principales commandes qu'il ajoute
+   → Configurer l'accès SSH avec authentification locale
+
+   💡 Aperçu des fonctions de sécurité de base : le but
+      n'est pas de devenir expert en sécurité dès
+      aujourd'hui
+
+----------------------------------------------
+🖧 1. LA TOPOLOGIE DU LAB
+----------------------------------------------
+
+   PC-LAN ─── G0/0/0 [Routeur 4331] G0/0/1 ─── PC-« Internet »
+   10.0.0.1                                    11.0.0.1
+
+   | Équipement      | Adresse         | Passerelle    |
+   |-----------------|-----------------|---------------|
+   | PC LAN          | 10.0.0.1 /24    | 10.0.0.254    |
+   | PC « Internet » | 11.0.0.1 /24    | 11.0.0.254    |
+   | R1 G0/0/0 (LAN) | 10.0.0.254 /24  |               |
+   | R1 G0/0/1 (Int.)| 11.0.0.254 /24  |               |
+
+   Router(config)# interface g0/0/0
+   Router(config-if)# ip address 10.0.0.254 255.255.255.0
+   Router(config-if)# no shutdown
+   Router(config-if)# interface g0/0/1
+   Router(config-if)# ip address 11.0.0.254 255.255.255.0
+   Router(config-if)# no shutdown
+
+   → Test : ping 11.0.0.1 depuis le PC LAN ✅
+     (le 1er ping est perdu à cause de l'ARP)
+
+----------------------------------------------
+🔑 2. RAPPEL : LES BASES DE LA SÉCURISATION
+----------------------------------------------
+
+🔹 Mettre des mots de passe PARTOUT :
+
+   → Accès console (câble console)
+   → Accès à distance (lignes VTY)
+   → Passage en mode privilégié (enable)
+
+🔹 La bannière (banner motd) :
+
+   → Message indiquant que l'équipement appartient à
+     l'entreprise, que les accès sont surveillés et que
+     tout accès non autorisé peut être poursuivi
+   → Rédigée avec l'aide de juristes
+   → Donne l'outil juridique pour poursuivre un attaquant
+     (il ne pourra pas dire « je pensais que c'était mon
+     routeur »)
+
+----------------------------------------------
+🚪 3. POURQUOI DÉSACTIVER LES SERVICES INUTILES ?
+----------------------------------------------
+
+🔹 Un routeur moderne fait bien plus que router :
+
+   → Il peut jouer le rôle de serveur DHCP, DNS, HTTP,
+     FTP...
+   → Ces services sont fournis « en bonus » par Cisco
+
+🔹 Le danger :
+
+   → Chaque service actif = un port ouvert
+   → Un port ouvert peut être écouté ou servir de porte
+     d'entrée
+
+   💬 « C'est comme construire une maison avec 45 portes...
+      et les laisser toutes ouvertes »
+
+🔹 Le problème : personne ne connaît TOUS les services,
+   ports et protocoles → d'où l'intérêt d'un outil qui le
+   fait pour nous
+
+----------------------------------------------
+🤖 4. CISCO AUTOSECURE : LE PRINCIPE
+----------------------------------------------
+
+🔹 Une seule commande, en mode privilégié :
+
+   Router# auto secure
+
+🔹 Fonctionnement :
+
+   → Mode INTERACTIF : le routeur pose des questions
+   → Selon les réponses, il applique les bonnes
+     protections
+   → Il insère des commandes que même un administrateur ne
+     connaît pas forcément
+
+🔹 Astuces :
+
+   → La valeur entre crochets [ ] est la réponse par
+     défaut : appuyer sur Entrée la valide
+   → Sur un vrai routeur, AutoSecure applique plus de
+     commandes que dans Packet Tracer (qui ne supporte pas
+     toutes les fonctions)
+
+----------------------------------------------
+❓ 5. AUTOSECURE PAS À PAS
+----------------------------------------------
+
+   | Question posée                                   | Réponse du lab        |
+   |--------------------------------------------------|-----------------------|
+   | Le routeur est-il connecté à Internet ?          | yes                   |
+   | Combien d'interfaces vers Internet ?             | 1                     |
+   | Quelle est l'interface Internet ?                | GigabitEthernet0/0/1  |
+   |                                                  | (nom complet !)       |
+   | → désactivation des services inutiles            | (automatique)         |
+   | Bannière (entre deux caractères délimiteurs)     | message d'avertissement|
+   | enable secret                                    | cisco                 |
+   | enable password (doit être DIFFÉRENT du secret)  | cisco1                |
+   | Nom d'utilisateur / mot de passe                 | admin / cisco         |
+   | Durée de blocage après attaque de connexion      | 120 (secondes)        |
+   | Nombre maximum d'échecs de connexion             | 3                     |
+   | Période d'observation des échecs                 | 90 (secondes)         |
+   | Configurer SSH ?                                 | yes                   |
+   | Nom d'hôte                                       | R1                    |
+   | Nom de domaine                                   | esi.com               |
+   | Activer CEF / fonctions pare-feu ?               | yes                   |
+   | Appliquer la configuration à la running-config ? | yes                   |
+
+🔹 Pièges rencontrés dans la vidéo :
+
+   → Taper l'interface en abrégé (g0/0/1) ne fonctionne
+     pas : il faut le nom complet
+   → Coller une bannière sur plusieurs lignes pose
+     problème : chaque « Entrée » est prise comme la fin
+     du message
+   → Le secret et le password identiques sont refusés
+
+🔹 La protection contre les connexions répétées :
+
+   → Commande équivalente :
+     login block-for 120 attempts 3 within 90
+   → Si 3 échecs en 90 secondes → accès bloqué
+     pendant 120 secondes
+   → Protège contre les attaques par force brute
+
+----------------------------------------------
+📜 6. LES COMMANDES INSÉRÉES PAR AUTOSECURE
+----------------------------------------------
+
+🔹 Services désactivés :
+
+   | Commande                      | Effet                                     |
+   |-------------------------------|-------------------------------------------|
+   | no service finger             | Désactive le service Finger               |
+   | no service pad                | Désactive le service PAD                  |
+   | no service tcp-small-servers  | Désactive les petits serveurs TCP         |
+   | no service udp-small-servers  | Désactive les petits serveurs UDP         |
+   | no ip bootp server            | Désactive BOOTP (ancêtre de DHCP)         |
+   | no ip source-route            | Refuse le routage à la source             |
+   | no ip gratuitous-arps         | Désactive les ARP gratuits                |
+   | no cdp run                    | Désactive CDP                             |
+
+🔹 Pourquoi désactiver CDP ?
+
+   → CDP (Cisco Discovery Protocol) découvre les
+     équipements Cisco voisins
+   → Utile (ex. : voix sur IP), mais il DÉVOILE des
+     informations sur l'équipement → à couper côté Internet
+
+🔹 Commandes de sécurité ajoutées :
+
+   | Commande                          | Effet                                 |
+   |-----------------------------------|---------------------------------------|
+   | service password-encryption       | Chiffre les mots de passe de la config|
+   | banner motd                       | Bannière d'avertissement              |
+   | enable secret / enable password   | Mots de passe du mode privilégié      |
+   | username admin ...                | Compte local                          |
+   | aaa new-model                     | Active le modèle AAA                  |
+   | aaa authentication login ... local| Authentification par la base locale   |
+   | login block-for ...               | Anti force brute                      |
+   | ip cef                            | Cisco Express Forwarding              |
+   | access-list ...                   | ACL (ex. : bloquer BOOTP)             |
+   | logging ...                       | Journalisation                        |
+   | règles d'inspection (pare-feu)    | Côté interface Internet               |
+
+🔹 CEF (Cisco Express Forwarding) :
+
+   → Accélère le routage
+   → Renforce aussi la sécurité : contrôle croisé avec la
+     table d'adjacence pour vérifier que les routes
+     existent bien
+
+🔹 Résultat :
+
+   → Connexion console : il faut désormais
+     admin / cisco, puis « enable » → cisco
+   → Toutes les commandes : visibles avec
+     show running-config
+
+----------------------------------------------
+🔒 7. FINALISER SSH À LA MAIN
+----------------------------------------------
+
+🔹 Constat : dans Packet Tracer, la clé RSA n'avait pas été
+   générée et les lignes VTY acceptaient encore Telnet
+
+🔹 Configuration SSH complète :
+
+   R1(config)# hostname R1
+   R1(config)# ip domain-name esi.com
+   R1(config)# crypto key generate rsa
+      How many bits in the modulus [512]: 2048
+   R1(config)# ip ssh version 2
+   R1(config)# username admin secret cisco
+   R1(config)# line vty 0 4
+   R1(config-line)# transport input ssh
+   R1(config-line)# login local
+
+   → 2048 bits = la clé RSA la plus robuste proposée
+     (512 à 2048)
+   → transport input ssh : SSH uniquement (plus de Telnet)
+
+🔹 Le blocage AAA dans le lab :
+
+   → Avec « aaa new-model », l'authentification passe par
+     AAA ; pour un vrai déploiement, il faut un serveur AAA
+     (TACACS+ ou RADIUS)
+   → Pour le test, le formateur retire AAA :
+     R1(config)# no aaa new-model
+     puis remet « login local » sur les lignes VTY
+
+🔹 Test depuis le PC LAN (Packet Tracer) :
+
+   PC> ssh -l admin 10.0.0.254
+   Password: cisco
+   R1> enable
+   Password: cisco
+   R1#   ✅ connecté en SSH
+
+
+----------------------------------------------
+📋 8. RÉCAPITULATIF DES COMMANDES
+----------------------------------------------
+
+   | Commande                                   | Rôle                         |
+   |--------------------------------------------|------------------------------|
+   | auto secure                                | Lance l'assistant AutoSecure |
+   | service password-encryption                | Chiffre les mots de passe    |
+   | banner motd # message #                    | Bannière légale              |
+   | login block-for 120 attempts 3 within 90   | Bloque la force brute        |
+   | no cdp run                                 | Désactive CDP                |
+   | ip domain-name <domaine>                   | Prérequis SSH                |
+   | crypto key generate rsa                    | Génère la clé SSH            |
+   | ip ssh version 2                           | Force SSH v2                 |
+   | transport input ssh                        | SSH seulement sur les VTY    |
+   | login local                                | Utilise les comptes locaux   |
+   | show running-config                        | Vérifie la configuration     |
+
+
+----------------------------------------------
+📌 À RETENIR
+----------------------------------------------
+
+1️⃣ Chaque service actif = un port ouvert = un risque
+   → désactiver tout ce qui est inutile
+
+2️⃣ « auto secure » sécurise un routeur Cisco en une
+   commande, en mode interactif
+
+3️⃣ AutoSecure désactive les services inutiles (CDP,
+   finger, BOOTP, petits serveurs...) et ajoute bannière,
+   mots de passe, chiffrement, anti force brute, CEF,
+   règles de pare-feu
+
+4️⃣ enable secret et enable password doivent être
+   différents
+
+5️⃣ login block-for 120 attempts 3 within 90 :
+   3 échecs en 90 s → blocage 120 s
+
+6️⃣ SSH = hostname + domain-name + clé RSA (2048) +
+   ip ssh version 2 + transport input ssh + login local
+
+7️⃣ Toujours vérifier le résultat avec show running-config
