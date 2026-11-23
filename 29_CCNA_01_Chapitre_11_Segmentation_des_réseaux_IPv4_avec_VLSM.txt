@@ -1,0 +1,368 @@
+======================================================================
+    ✂️ SEGMENTATION DES RÉSEAUX IPv4 AVEC VLSM (CCNA 1 - Chapitre 11)
+======================================================================
+
+📋 SOMMAIRE DE LA LEÇON :
+
+   1. La conception structurée (principe parent / enfants)
+   2. Exemple de plan d'adressage structuré (10.pays.dépt.hôtes)
+   3. Rappel : découpage à masque fixe (/27 identiques)
+   4. Qu'est-ce que le VLSM ?
+   5. L'énoncé de l'exercice VLSM
+   6. Les règles du VLSM
+   7. Résolution pas à pas (N1 → N4)
+   8. Les réseaux d'interconnexion (/30)
+   9. Tableau final du plan d'adressage
+   10. Astuces pour aller vite et vérifier
+
+----------------------------------------------
+🎯 OBJECTIFS DE LA LEÇON
+----------------------------------------------
+
+À la fin de cette leçon, vous saurez :
+
+   → Expliquer l'intérêt d'un plan d'adressage structuré
+   → Expliquer ce qu'est le VLSM et pourquoi l'utiliser
+   → Découper une adresse en sous-réseaux de tailles
+     différentes selon le besoin de chaque réseau
+   → Calculer pour chaque sous-réseau : adresse réseau,
+     masque, première/dernière adresse, diffusion
+   → Adresser les liaisons entre routeurs (/30)
+
+----------------------------------------------
+🏗️ 1. LA CONCEPTION STRUCTURÉE
+----------------------------------------------
+
+🔹 Principe parent / enfants :
+
+   → On part d'UNE seule adresse « parent »
+   → On la découpe en petits réseaux « enfants »
+   → C'est le point le plus important du chapitre 11
+
+🔹 Pourquoi c'est pratique :
+
+   → Un seul identifiant pour tout le réseau de l'entreprise
+   → Pratique pour la sortie Internet
+   → Pratique pour l'interconnexion des réseaux
+   → Pratique pour résumer les réseaux (protocoles de routage)
+   → Pratique pour appliquer des politiques de sécurité
+   → On n'annonce qu'UNE adresse à l'opérateur
+
+🔹 Bonnes pratiques :
+
+   → Utiliser des adresses PRIVÉES (les publiques ne nous
+     appartiennent pas)
+   → Prévoir les besoins en tenant compte de l'évolution
+     de l'entreprise
+   → Définir une politique stricte d'attribution des adresses
+   → Éviter les conflits d'adresses
+   → Rester organisé dans le temps (critères clairs)
+
+----------------------------------------------
+🌍 2. EXEMPLE DE PLAN D'ADRESSAGE STRUCTURÉ
+----------------------------------------------
+
+🔹 Cas : un grand groupe présent dans 150 pays
+
+   → Adresse parent : 10.0.0.0/8
+
+   Structure : 10 . PAYS . DÉPARTEMENT . HÔTES
+
+   | Octet | Rôle                         | Exemple               |
+   |-------|------------------------------|-----------------------|
+   | 1     | Identifiant de l'entreprise  | 10                    |
+   | 2     | Identifiant du pays          | 33 = France           |
+   | 3     | Département / site           | 75 = Paris, 92        |
+   | 4     | Hôtes (254 max par réseau)   | .1 → .254             |
+
+🔹 Identifiant du pays, deux méthodes :
+
+   → Une liste maison : France = 1, Espagne = 2,
+     Portugal = 3, Angleterre = 4, États-Unis = 5...
+   → L'indicatif téléphonique : 33 = France, 34 = Espagne
+     ⚠️ Problème si l'indicatif dépasse 255
+       (ex. : Émirats arabes unis = 971)
+       → on lui attribue un autre numéro et on le note
+
+🔹 Résultat :
+
+   → 10.0.0.0/8 = tout le groupe
+   → 10.33.0.0/16 = toute la France (les 10 000 salariés)
+   → On donne juste cette adresse à l'opérateur
+
+   💡 Un service compte rarement plus de 254 personnes ;
+      sinon, on adapte le masque
+
+----------------------------------------------
+📏 3. RAPPEL : DÉCOUPAGE À MASQUE FIXE
+----------------------------------------------
+
+🔹 Exercice de la leçon 28 :
+
+   → 192.168.1.0/24 découpé en 8 sous-réseaux /27
+   → On emprunte 3 bits (2³ = 8)
+   → Astuce : 256 ÷ 8 = 32 → les réseaux vont de 32 en 32
+
+   .0  .32  .64  .96  .128  .160  .192  .224   (tous en /27)
+
+🔹 Le problème :
+
+   → Tous les sous-réseaux ont la MÊME taille (30 hôtes)
+   → Un réseau de 100 postes → /27 ne suffit pas
+   → Un lien entre 2 routeurs → /27 gaspille 28 adresses
+
+   👉 Solution : des masques de tailles différentes = VLSM
+
+----------------------------------------------
+🎭 4. QU'EST-CE QUE LE VLSM ?
+----------------------------------------------
+
+🔹 VLSM = Variable Length Subnet Mask
+   (masque de sous-réseau à longueur variable)
+
+🔹 Principe :
+
+   → Créer des sous-réseaux avec des masques DIFFÉRENTS
+   → Chaque réseau reçoit juste la taille dont il a besoin
+   → Moins de gaspillage d'adresses
+
+🔹 L'image de la tarte 🥧 :
+
+   → On coupe la tarte en deux
+   → On mange une moitié (= on l'attribue à un réseau)
+   → On recoupe en deux la moitié qui reste
+   → On mange un morceau, on recoupe le reste...
+   → Le morceau qui reste à chaque étape = le « nouveau parent »
+
+----------------------------------------------
+📝 5. L'ÉNONCÉ DE L'EXERCICE
+----------------------------------------------
+
+🔹 Adresse disponible : 192.168.1.0/24
+
+🔹 Topologie : 3 routeurs (R1, R2, R3) reliés entre eux,
+   R1 relié à l'opérateur (ISP)
+
+🔹 Besoins :
+
+   | Réseau | Emplacement         | Besoin       |
+   |--------|---------------------|--------------|
+   | N1     | Derrière R1         | 100 postes   |
+   | N2     | Derrière R2         | 43 postes    |
+   | N3     | Derrière R2         | 15 postes    |
+   | N4     | Derrière R3 (serveurs) | 12 postes |
+   | R1-R2  | Interconnexion      | 2 adresses   |
+   | R1-R3  | Interconnexion      | 2 adresses   |
+   | R3-R2  | Interconnexion      | 2 adresses   |
+   | R1-ISP | Interconnexion      | 2 adresses   |
+
+   ⚠️ Ne pas oublier les liaisons entre routeurs : chaque
+      interface de routeur a besoin d'une adresse IP
+
+----------------------------------------------
+⚖️ 6. LES RÈGLES DU VLSM
+----------------------------------------------
+
+🔹 Règle n°1 : TOUJOURS du plus GRAND au plus PETIT
+
+   → On trie les réseaux par nombre de postes décroissant
+   → N1 (100) → N2 (43) → N3 (15) → N4 (12) → liaisons (2)
+
+🔹 Règle n°2 : la partie réseau est « sacrée »
+
+   → Les bits réseau (/24 au départ) ne se touchent JAMAIS
+   → On ne joue que sur la partie hôte
+
+🔹 Règle n°3 : nombre de bits HÔTE
+
+   → Formule : 2ⁿ − 2 ≥ nombre de postes
+   → On retire TOUJOURS 2 (adresse réseau + diffusion)
+   → On emprunte de DROITE à GAUCHE (pour des hôtes)
+   → Les bits qui restent à gauche rejoignent la partie réseau
+
+🔹 Rappel : emprunter pour des RÉSEAUX
+
+   → Formule : 2ⁿ ≥ nombre de réseaux (PAS de −2)
+   → On emprunte de GAUCHE à DROITE
+
+   | On cherche des... | Formule        | Sens d'emprunt      |
+   |-------------------|----------------|---------------------|
+   | Hôtes             | 2ⁿ − 2 ≥ besoin| Droite → gauche     |
+   | Réseaux           | 2ⁿ ≥ besoin    | Gauche → droite     |
+
+🔹 Les puissances de 2 utiles :
+
+   | n | 2ⁿ  | 2ⁿ − 2 (hôtes) | Masque |
+   |---|-----|----------------|--------|
+   | 2 | 4   | 2              | /30    |
+   | 3 | 8   | 6              | /29    |
+   | 4 | 16  | 14             | /28    |
+   | 5 | 32  | 30             | /27    |
+   | 6 | 64  | 62             | /26    |
+   | 7 | 128 | 126            | /25    |
+
+----------------------------------------------
+🧮 7. RÉSOLUTION PAS À PAS
+----------------------------------------------
+
+🔹 N1 – 100 postes (parent : 192.168.1.0/24)
+
+   → 2⁷ − 2 = 126 ≥ 100 ✅ → 7 bits hôte
+   → Il reste 1 bit pour le réseau → /25
+   → Ce bit vaut 0 ou 1 → deux moitiés :
+       .0/25   → attribué à N1
+       .128/25 → nouveau parent
+
+   192.168.1.0 /25 | masque 255.255.255.128
+   Plage : .1 → .126 | Diffusion : .127
+
+🔹 N2 – 43 postes (parent : 192.168.1.128/25)
+
+   → 2⁵ − 2 = 30 < 43 ❌
+   → 2⁶ − 2 = 62 ≥ 43 ✅ → 6 bits hôte → /26
+   → Deux moitiés :
+       .128/26 → attribué à N2
+       .192/26 → nouveau parent (128 + 64)
+
+   192.168.1.128 /26 | masque 255.255.255.192
+   Plage : .129 → .190 | Diffusion : .191
+
+🔹 N3 – 15 postes (parent : 192.168.1.192/26)
+
+   → 2⁴ − 2 = 14 < 15 ❌  ⚠️ PIÈGE : 16 ≥ 15, mais on
+     oublie le −2 !
+   → 2⁵ − 2 = 30 ≥ 15 ✅ → 5 bits hôte → /27
+   → Deux moitiés :
+       .192/27 → attribué à N3
+       .224/27 → nouveau parent (192 + 32)
+
+   192.168.1.192 /27 | masque 255.255.255.224
+   Plage : .193 → .222 | Diffusion : .223
+
+🔹 N4 – 12 postes (parent : 192.168.1.224/27)
+
+   → 2⁴ − 2 = 14 ≥ 12 ✅ → 4 bits hôte → /28
+   → Deux moitiés :
+       .224/28 → attribué à N4
+       .240/28 → nouveau parent (224 + 16)
+
+   192.168.1.224 /28 | masque 255.255.255.240
+   Plage : .225 → .238 | Diffusion : .239
+
+   (Dans la vidéo, le formateur se trompe d'abord sur la
+    première adresse puis corrige : c'est bien .225)
+
+----------------------------------------------
+🔗 8. LES RÉSEAUX D'INTERCONNEXION
+----------------------------------------------
+
+🔹 Besoin : 4 liaisons de 2 adresses chacune
+   (une adresse par interface de routeur)
+
+🔹 Taille d'une liaison :
+
+   → 2² − 2 = 2 ✅ → 2 bits hôte → /30
+   → Masque : 255.255.255.252
+   → 💡 Les liaisons point à point sont TOUJOURS en /30
+
+🔹 Combien de réseaux ? (parent : 192.168.1.240/28)
+
+   → On veut 4 réseaux → 2² = 4 → on emprunte 2 bits
+     (de gauche à droite, sans −2 car on compte des réseaux)
+   → 16 adresses ÷ 4 = 4 → les réseaux vont de 4 en 4
+
+   .240  .244  .248  .252   (tous en /30)
+
+🔹 Dans chaque /30 :
+
+   → 4 adresses : réseau, 2 utilisables, diffusion
+   → Ex. : .240 réseau, .241 et .242 pour les 2 routeurs,
+     .243 diffusion, .244 = réseau suivant
+
+🔹 Bonne pratique (passerelle) :
+
+   → On donne généralement aux routeurs la DERNIÈRE adresse
+     utilisable de chaque réseau LAN (adresse de passerelle)
+
+----------------------------------------------
+📊 9. TABLEAU FINAL DU PLAN D'ADRESSAGE
+----------------------------------------------
+
+   | Réseau | Besoin | Adresse réseau  | Masque            | 1re adresse | Dernière   | Diffusion |
+   |--------|--------|-----------------|-------------------|-------------|------------|-----------|
+   | N1     | 100    | 192.168.1.0/25  | 255.255.255.128   | .1          | .126       | .127      |
+   | N2     | 43     | 192.168.1.128/26| 255.255.255.192   | .129        | .190       | .191      |
+   | N3     | 15     | 192.168.1.192/27| 255.255.255.224   | .193        | .222       | .223      |
+   | N4     | 12     | 192.168.1.224/28| 255.255.255.240   | .225        | .238       | .239      |
+   | R1-R2  | 2      | 192.168.1.240/30| 255.255.255.252   | .241        | .242       | .243      |
+   | R1-R3  | 2      | 192.168.1.244/30| 255.255.255.252   | .245        | .246       | .247      |
+   | R3-R2  | 2      | 192.168.1.248/30| 255.255.255.252   | .249        | .250       | .251      |
+   | R1-ISP | 2      | 192.168.1.252/30| 255.255.255.252   | .253        | .254       | .255      |
+
+   ✅ La totalité de 192.168.1.0/24 est utilisée, sans
+      chevauchement : la diffusion de chaque réseau + 1
+      = adresse du réseau suivant
+
+----------------------------------------------
+⚡ 10. ASTUCES POUR ALLER VITE ET VÉRIFIER
+----------------------------------------------
+
+🔹 Première adresse = adresse réseau + 1
+
+🔹 Diffusion = adresse du réseau suivant − 1
+   → Ex. N1 : réseau suivant .128 → diffusion .127
+   → Sinon : 255 − valeur des bits réseau à 0, ou
+     convertir le binaire (bits hôte à 1)
+
+🔹 Dernière adresse = diffusion − 1
+
+🔹 Nouveau parent = réseau + taille du bloc
+   → .0 + 128 = .128 | .128 + 64 = .192
+   → .192 + 32 = .224 | .224 + 16 = .240
+
+🔹 Coïncidence utile :
+
+   → Quand on ajoute 1 bit réseau à chaque étape, la valeur
+     du nouveau parent = la valeur du nouveau masque
+     (128, 192, 224, 240...)
+
+🔹 Contrôle de cohérence :
+
+   → Diffusion + 1 doit TOUJOURS donner le réseau suivant
+   → Si ce n'est pas le cas → erreur quelque part
+   → On ne peut pas dépasser .255 dans un octet
+
+🔹 Si vous êtes perdu :
+
+   → Revenir au tableau magique (128 64 32 16 8 4 2 1)
+   → Écrire l'octet en binaire et appliquer la règle :
+     bits réseau à 1 / bits hôte à 0 (masque)
+     bits hôte à 0 (réseau) / bits hôte à 1 (diffusion)
+
+   💡 Conseil du formateur : regarder la vidéo une première
+      fois lentement, puis la revoir en accéléré pour
+      confirmer
+
+
+----------------------------------------------
+📌 À RETENIR
+----------------------------------------------
+
+1️⃣ Conception structurée = une adresse parent découpée en
+   réseaux enfants → une seule adresse à annoncer
+
+2️⃣ VLSM = Variable Length Subnet Mask : chaque sous-réseau
+   reçoit un masque adapté à son besoin
+
+3️⃣ Toujours traiter du plus GRAND au plus PETIT réseau
+
+4️⃣ Pour des hôtes : 2ⁿ − 2 ≥ besoin (ne jamais oublier −2)
+   Pour des réseaux : 2ⁿ ≥ besoin (pas de −2)
+
+5️⃣ Chaque étape : on coupe le parent en deux, on attribue
+   une moitié, l'autre devient le nouveau parent
+
+6️⃣ Liaisons entre routeurs = /30 (255.255.255.252),
+   2 adresses utilisables
+
+7️⃣ Vérification : diffusion + 1 = réseau suivant
