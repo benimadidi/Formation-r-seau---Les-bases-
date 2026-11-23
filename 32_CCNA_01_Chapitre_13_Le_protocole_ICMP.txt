@@ -1,0 +1,297 @@
+======================================================================
+    📶 LE PROTOCOLE ICMP (CCNA 1 - Chapitre 13)
+======================================================================
+
+📋 SOMMAIRE DE LA LEÇON :
+
+   1. Qu'est-ce que l'ICMP ?
+   2. Les messages ICMP communs à IPv4 et IPv6
+   3. Les codes « destination inaccessible »
+   4. Le délai dépassé (TTL)
+   5. Les messages ICMPv6 (RS, RA, NS, NA)
+   6. Tester la connectivité avec ping
+   7. Localiser une panne avec traceroute
+   8. Pourquoi un équipement ne répond pas au ping ?
+   9. Démo Packet Tracer
+
+----------------------------------------------
+🎯 OBJECTIFS DE LA LEÇON
+----------------------------------------------
+
+À la fin de cette leçon, vous saurez :
+
+   → Expliquer le rôle du protocole ICMP
+   → Reconnaître les principaux messages et codes ICMP
+   → Expliquer les messages ICMPv6 RS, RA, NS et NA
+   → Utiliser ping et traceroute pour diagnostiquer un
+     problème réseau et prouver d'où il vient
+
+   💡 Chapitre « bonus » qui termine la partie couche 3 ;
+      la suite reprend les couches du modèle OSI
+      (transport, application) puis la sécurité
+
+----------------------------------------------
+📡 1. QU'EST-CE QUE L'ICMP ?
+----------------------------------------------
+
+🔹 ICMP = Internet Control Message Protocol
+
+   → Protocole qui fournit des retours (messages) sur les
+     problèmes de traitement des paquets IP
+   → C'est le protocole derrière les commandes ping et
+     traceroute
+
+🔹 Deux versions :
+
+   → ICMPv4 → pour l'IPv4
+   → ICMPv6 → pour l'IPv6
+
+----------------------------------------------
+💬 2. LES MESSAGES COMMUNS À IPv4 ET IPv6
+----------------------------------------------
+
+   | Message                   | Rôle                                   |
+   |---------------------------|----------------------------------------|
+   | Accessibilité de l'hôte   | Vérifier qu'un hôte répond             |
+   | (Echo Request / Reply)    | → c'est le ping                        |
+   | Destination ou service    | Prévenir que la destination n'est pas  |
+   | inaccessible              | joignable                              |
+   | Délai dépassé             | Prévenir qu'un paquet a été abandonné  |
+   | (Time Exceeded)           | (TTL arrivé à 0)                       |
+
+----------------------------------------------
+🚫 3. LES CODES « DESTINATION INACCESSIBLE »
+----------------------------------------------
+
+🔹 ICMPv4 :
+
+   | Code | Signification              |
+   |------|----------------------------|
+   | 0    | Réseau inaccessible        |
+   | 1    | Hôte inaccessible          |
+   | 2    | Protocole inaccessible     |
+   | 3    | Port inaccessible          |
+
+🔹 ICMPv6 :
+
+   | Code | Signification                                    |
+   |------|--------------------------------------------------|
+   | 0    | Pas de route vers la destination                 |
+   | 1    | Communication avec la destination interdite      |
+   |      | (bloquée administrativement)                     |
+   | 2    | Au-delà de la portée de l'adresse source         |
+   | 3    | Adresse inaccessible                             |
+   | 4    | Port inaccessible                                |
+
+   → Presque les mêmes informations, avec quelques nuances
+
+----------------------------------------------
+⏱️ 4. LE DÉLAI DÉPASSÉ (TTL)
+----------------------------------------------
+
+🔹 Rappel : le champ TTL (Time To Live) de l'en-tête IP
+
+   → À chaque routeur traversé, le TTL diminue de 1
+   → Quand il arrive à 0, le paquet est détruit
+
+🔹 Le message ICMP envoyé alors :
+
+   → « TTL expired in transit » (délai dépassé)
+   → Évite qu'un paquet tourne en boucle indéfiniment
+
+   💡 En IPv6, ce champ s'appelle « Hop Limit » (limite de
+      sauts), avec le même principe
+
+----------------------------------------------
+🔁 5. LES MESSAGES ICMPv6
+----------------------------------------------
+
+🔹 L'IPv6 utilise énormément l'ICMPv6, notamment pour
+   REMPLACER L'ARP (qui n'existe pas en IPv6)
+
+   | Message | Nom                                | Envoyé par   |
+   |---------|------------------------------------|--------------|
+   | RS      | Router Solicitation                | Hôte         |
+   |         | (sollicitation de routeur)         |              |
+   | RA      | Router Advertisement               | Routeur      |
+   |         | (annonce de routeur)               |              |
+   | NS      | Neighbor Solicitation              | Hôte         |
+   |         | (sollicitation de voisin)          |              |
+   | NA      | Neighbor Advertisement             | Hôte         |
+   |         | (annonce de voisin)                |              |
+
+🔹 Scénario 1 – obtenir une configuration (SLAAC) :
+
+   ① Le PC se branche et envoie un RS au routeur :
+      « peux-tu me donner ma configuration IPv6 ? »
+   ② Le routeur répond par un RA avec le préfixe :
+      « voici le préfixe, débrouille-toi pour le reste »
+   ③ Le PC se crée un ID d'interface
+
+🔹 Scénario 2 – vérifier que l'adresse est libre (DAD) :
+
+   ① Le PC envoie un NS à tous :
+      « quelqu'un utilise-t-il cette adresse ? »
+   ② Si quelqu'un l'a déjà → il répond par un NA
+      → le PC choisit une autre adresse et recommence
+   ③ Si aucun NA ne revient → le PC garde l'adresse
+
+🔹 Scénario 3 – trouver une adresse MAC (remplace l'ARP) :
+
+   → En IPv4 : requête ARP en diffusion
+     « qui a cette IP ? donnez-moi votre MAC »
+   → En IPv6 : le PC envoie un NS à l'adresse IP
+     visée ; la machine répond par un NA avec sa MAC
+
+   ❓ Pourquoi ne pas envoyer directement les données ?
+   → Une trame ne peut pas circuler sans adresse MAC de
+     destination : il faut la connaître d'abord
+
+----------------------------------------------
+🏓 6. TESTER LA CONNECTIVITÉ AVEC PING
+----------------------------------------------
+
+🔹 Étape 1 – tester sa propre carte réseau (bouclage) :
+
+   ping 127.0.0.1     (IPv4)
+   ping localhost     → répond en IPv6 (::1) sur les
+                        machines récentes, car l'IPv6 est
+                        prioritaire
+
+🔹 Étape 2 – pinger la passerelle par défaut :
+
+   → Si elle répond : le réseau local et sa configuration
+     sont OK
+
+🔹 Étape 3 – pinger l'interface EXTÉRIEURE de son routeur
+   (côté WAN) :
+
+   → Si elle répond : votre routeur fonctionne bien
+
+🔹 Pourquoi c'est utile ?
+
+   → Dans une entreprise, chacun dit souvent « ce n'est pas
+     chez moi » : le ping permet de PROUVER que le problème
+     ne vient pas de son côté
+
+🔹 Le premier ping perdu :
+
+   → En Packet Tracer, la 1re réponse échoue souvent
+     (« Request timed out »)
+   → Normal : il faut d'abord résoudre les adresses MAC
+     (ARP) à chaque saut ; le délai d'attente expire
+   → On relance le ping : tout répond ✅
+
+----------------------------------------------
+🗺️ 7. LOCALISER UNE PANNE AVEC TRACEROUTE
+----------------------------------------------
+
+🔹 Commande :
+
+   → Windows : tracert <destination>
+   → Cisco / Packet Tracer : traceroute <destination>
+
+🔹 Ce qu'elle affiche :
+
+   → Chaque routeur traversé jusqu'à la destination
+   → On voit exactement où les paquets s'arrêtent
+
+🔹 Exemple : tracert google.com
+
+   → Résolution DNS d'abord (google.com → adresse IPv6
+     commençant par 2)
+   → Box → réseau de l'opérateur → ... → serveur Google
+   → Un saut peut afficher une perte ponctuelle sans que
+     ce soit un problème
+
+🔹 Exemple d'adresse injoignable :
+
+   → La trace passe la box, puis le réseau de l'opérateur...
+   → puis « Délai d'attente de la demande dépassé »
+     (Request timed out) en boucle
+   → Preuve : « tout fonctionne jusqu'à la sortie de mon
+     réseau ; le problème est de votre côté »
+   → Une capture d'écran du traceroute sert de preuve
+
+----------------------------------------------
+🛡️ 8. POURQUOI UN ÉQUIPEMENT NE RÉPOND PAS AU PING ?
+----------------------------------------------
+
+🔹 Situation :
+
+   → Un routeur apparaît dans le traceroute (on passe par
+     lui) mais ne répond pas au ping
+
+🔹 Ce n'est PAS une panne :
+
+   → S'il répond aux messages du traceroute, il fonctionne
+   → Il bloque simplement les pings par sécurité
+
+🔹 Pourquoi bloquer l'ICMP ?
+
+   → Aucun intérêt de pinger un routeur d'Internet qui
+     n'héberge rien
+   → Les pings peuvent servir à :
+     • récupérer des informations
+     • préparer des attaques (DDoS / déni de service)
+     • affaiblir un serveur qui passe son temps à répondre
+
+🔹 La solution : les ACL (Access Control Lists = listes
+   de contrôle d'accès) – vues plus tard dans la formation
+
+   → Bloquer le ping par défaut sur les équipements
+     sensibles (routeurs, switchs, serveurs, voire PC)
+   → L'autoriser seulement depuis un réseau de
+     maintenance (ex. : le helpdesk en 10.0.0.0/24)
+   → Lever la restriction le temps d'une maintenance
+
+   💡 Réflexe : si un ping échoue, ne pas passer 5 heures à
+      diagnostiquer → vérifier d'abord si une ACL bloque
+      l'ICMP
+
+----------------------------------------------
+💻 9. DÉMO PACKET TRACER
+----------------------------------------------
+
+🔹 Topologie : PC 192.168.1.1 → 2 routeurs → PC 192.168.2.3
+
+🔹 ping 192.168.2.3
+
+   → 1re réponse en échec (résolution ARP), puis ✅
+
+🔹 tracert 192.168.2.3
+
+   → 192.168.1.254 (passerelle) → 2e routeur → 192.168.2.3
+   → Affiche les 2 routeurs traversés puis la destination
+
+🔹 tracert 192.168.2.50 (machine inexistante)
+
+   → On passe les 2 routeurs, puis plus rien
+   → Preuve que le réseau est sain jusqu'au routeur de
+     destination ; le problème est au-delà (PC éteint,
+     mauvaise adresse...)
+
+
+----------------------------------------------
+📌 À RETENIR
+----------------------------------------------
+
+1️⃣ ICMP = Internet Control Message Protocol : messages
+   d'erreur et de contrôle d'IP (ICMPv4 et ICMPv6)
+
+2️⃣ Messages communs : accessibilité de l'hôte (ping),
+   destination inaccessible, délai dépassé (TTL à 0)
+
+3️⃣ Codes ICMPv4 : 0 réseau, 1 hôte, 2 protocole,
+   3 port inaccessible
+
+4️⃣ ICMPv6 : RS / RA (routeur) et NS / NA (voisins)
+   → NS / NA remplacent l'ARP et servent au DAD
+
+5️⃣ Méthode de diagnostic : bouclage → passerelle →
+   interface extérieure du routeur → traceroute
+
+6️⃣ Le 1er ping perdu est normal (résolution ARP)
+
+7️⃣ Un équipement qui ne répond pas au ping n'est pas
+   forcément en panne : une ACL peut bloquer l'ICMP
