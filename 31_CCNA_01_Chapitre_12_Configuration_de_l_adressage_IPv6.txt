@@ -1,0 +1,293 @@
+======================================================================
+    ⚙️ CONFIGURATION DE L'ADRESSAGE IPv6 (CCNA 1 - Chapitre 12)
+======================================================================
+
+📋 SOMMAIRE DE LA LEÇON :
+
+   1. La topologie du lab (Packet Tracer)
+   2. Le plan d'adressage
+   3. Retrouver l'adresse MAC depuis une link-local EUI-64
+   4. Configurer les PC
+   5. La règle d'or des commandes IPv6 Cisco
+   6. Configurer le routeur
+   7. Les commandes de vérification
+   8. Le piège : ipv6 unicast-routing
+   9. Personnaliser les adresses link-local
+   10. Récapitulatif des commandes
+
+----------------------------------------------
+🎯 OBJECTIFS DE LA LEÇON
+----------------------------------------------
+
+À la fin de cette leçon, vous saurez :
+
+   → Configurer une adresse IPv6 globale sur un PC et sur
+     un routeur Cisco
+   → Activer le routage IPv6
+   → Lire la table de routage IPv6
+   → Vérifier une adresse link-local EUI-64
+   → Remplacer une adresse link-local automatique par une
+     adresse choisie
+
+----------------------------------------------
+🖧 1. LA TOPOLOGIE DU LAB
+----------------------------------------------
+
+   PC1 ─┐                              ┌─ PC3
+        ├─ SW1 ── G0/0/0 [R1] G0/0/1 ── SW2 ─┤
+   PC2 ─┘                              └─ (PC4)
+
+   → 1 routeur Cisco (4331 ou 1941, peu importe)
+   → 2 switchs 2960
+   → Des PC de chaque côté
+
+   💡 Toujours sauvegarder le fichier Packet Tracer avant
+      de commencer (ex. : Lab_IPv6)
+
+----------------------------------------------
+🗺️ 2. LE PLAN D'ADRESSAGE
+----------------------------------------------
+
+   | Réseau   | Préfixe                | Routeur (passerelle)   |
+   |----------|------------------------|------------------------|
+   | Réseau 1 | 2001:DB8:CAFE:1::/64   | 2001:DB8:CAFE:1::      |
+   | Réseau 2 | 2001:DB8:CAFE:2::/64   | 2001:DB8:CAFE:2::      |
+
+   | Équipement | Adresse                  | Passerelle          |
+   |------------|--------------------------|---------------------|
+   | PC1        | 2001:DB8:CAFE:1::1/64    | 2001:DB8:CAFE:1::   |
+   | PC2        | 2001:DB8:CAFE:1::2/64    | 2001:DB8:CAFE:1::   |
+   | PC3        | 2001:DB8:CAFE:2::1/64    | 2001:DB8:CAFE:2::   |
+
+🔹 Choix du formateur :
+
+   → Le routeur prend l'adresse « 0 » du réseau
+     (identique à l'identifiant du réseau)
+   → Impossible en IPv4 (c'est l'adresse réseau), possible
+     en IPv6 selon lui
+
+   ⚠️ Remarque : sur du matériel Cisco réel, l'ID d'interface
+      tout à zéro est réservé (anycast du routeur de
+      sous-réseau). L'usage courant est de donner ::1 au
+      routeur, ex. 2001:DB8:CAFE:1::1
+
+----------------------------------------------
+🔍 3. RETROUVER LA MAC DEPUIS UNE LINK-LOCAL
+----------------------------------------------
+
+🔹 Constat :
+
+   → Sans rien configurer, le PC a déjà une adresse IPv6
+     link-local (FE80::...)
+   → En IPv4, sans DHCP, il prend une APIPA (169.254.x.x)
+   → Cisco utilise EUI-64 par défaut → on voit FFFE au milieu
+
+🔹 Exemple : FE80::230:F2FF:FE68:7882
+
+   ① ID d'interface : 0230:F2FF:FE68:7882
+      (on remet le 0 de gauche supprimé)
+   ② Retirer FFFE au milieu :
+      0230:F2 | 68:7882  →  02 30 F2 68 78 82
+   ③ Ré-inverser le 7e bit du premier octet :
+      02 = 0000 0010 → 0000 0000 = 00
+   ④ MAC = 0030.F268.7882 ✅
+      (vérifiable en survolant le PC dans Packet Tracer)
+
+   ⚠️ Le formateur se trompe d'abord dans la conversion
+      puis se corrige : attention au 0 de gauche qui a été
+      supprimé par la simplification
+
+----------------------------------------------
+💻 4. CONFIGURER LES PC
+----------------------------------------------
+
+🔹 Dans Packet Tracer : Desktop → IP Configuration
+   → Partie IPv6 → Static
+
+   → IPv6 Address : 2001:DB8:CAFE:1::1/64
+     (ne pas oublier le /64)
+   → Default Gateway : 2001:DB8:CAFE:1::
+
+🔹 Test dans le même réseau :
+
+   PC1> ping 2001:DB8:CAFE:1::2   ✅ fonctionne
+
+   → La partie IPv4 peut rester en DHCP : elle n'est pas
+     utilisée ici
+
+----------------------------------------------
+🗝️ 5. LA RÈGLE D'OR DES COMMANDES IPv6 CISCO
+----------------------------------------------
+
+🔹 Par défaut, les commandes Cisco concernent l'IPv4
+
+🔹 Pour l'IPv6 : remplacer « ip » par « ipv6 »
+
+   | IPv4                       | IPv6                         |
+   |----------------------------|------------------------------|
+   | ip address                 | ipv6 address                 |
+   | ip route                   | ipv6 route                   |
+   | show ip interface brief    | show ipv6 interface brief    |
+   | show ip route              | show ipv6 route              |
+   | show ip protocols          | show ipv6 protocols          |
+
+   → Une commande « show ip ... » n'affiche RIEN de l'IPv6
+
+----------------------------------------------
+🛠️ 6. CONFIGURER LE ROUTEUR
+----------------------------------------------
+
+   Router> enable
+   Router# configure terminal
+
+   Router(config)# interface g0/0/0
+   Router(config-if)# ipv6 address 2001:DB8:CAFE:1::/64
+   Router(config-if)# no shutdown
+
+   Router(config-if)# interface g0/0/1
+   Router(config-if)# ipv6 address 2001:DB8:CAFE:2::/64
+   Router(config-if)# no shutdown
+
+🔹 Remarques :
+
+   → Pas de masque de sous-réseau : juste /64
+   → On peut passer d'une interface à l'autre sans
+     « exit » (mais sans la tabulation)
+   → Ne pas oublier « no shutdown » : sinon l'interface
+     reste down
+
+----------------------------------------------
+🔎 7. LES COMMANDES DE VÉRIFICATION
+----------------------------------------------
+
+🔹 show interfaces g0/0/0
+
+   → Affiche l'adresse MAC de l'interface (Hardware is...)
+   → C'est elle que le routeur utilise en EUI-64 pour sa
+     link-local
+
+🔹 show ipv6 interface brief
+
+   → Pour chaque interface : la link-local (FE80::...)
+     et la globale configurée
+   → La link-local du routeur contient FFFE et le 7e bit
+     inversé (ex. 00 → 02)
+
+🔹 show ipv6 route
+
+   | Code | Signification                                      |
+   |------|----------------------------------------------------|
+   | C    | Réseau directement connecté (/64)                  |
+   | L    | Adresse locale de l'interface (/128)               |
+
+   → /128 = adresse fixe de l'interface : 0 bit d'hôte,
+     2⁰ = 1 seule adresse
+   → On retrouve aussi la métrique et la distance
+     administrative, comme en IPv4
+   → Ligne FF00::/8 via Null0 : c'est la plage MULTICAST
+     (le formateur la présente comme une adresse de
+     bouclage ; le bouclage IPv6 est en réalité ::1/128)
+
+----------------------------------------------
+⚠️ 8. LE PIÈGE : ipv6 unicast-routing
+----------------------------------------------
+
+🔹 Le test :
+
+   PC1> ping 2001:DB8:CAFE:2::1   ❌ échec
+
+   → Adresses correctes, interfaces up... mais rien ne passe
+
+🔹 La raison :
+
+   → Sur Cisco, le routage IPv6 n'est PAS actif par défaut
+   → Le routeur ne rejoint pas le groupe « tous les
+     routeurs » (FF02::2) et ne route pas l'IPv6
+
+🔹 La solution :
+
+   Router(config)# ipv6 unicast-routing
+
+   PC1> ping 2001:DB8:CAFE:2::1   ✅ fonctionne
+
+   💬 « C'est la commande la plus importante en IPv6 »
+
+   → Puis sauvegarder :
+     Router# copy running-config startup-config
+
+----------------------------------------------
+🔗 9. PERSONNALISER LES ADRESSES LINK-LOCAL
+----------------------------------------------
+
+🔹 Constat :
+
+   → Les link-local automatiques sont illisibles
+     (FE80:: + partie dérivée de la MAC)
+   → Le routeur peut avoir la même link-local sur ses
+     interfaces (une link-local ne quitte jamais son
+     réseau local) mais on veut s'organiser
+
+🔹 Convention utilisée : FE80::<réseau>:<machine>
+   (machine 0 = routeur)
+
+🔹 Sur le routeur :
+
+   Router(config)# interface g0/0/0
+   Router(config-if)# ipv6 address FE80::1:0 link-local
+
+   Router(config)# interface g0/0/1
+   Router(config-if)# ipv6 address FE80::2:0 link-local
+
+   → Le mot-clé « link-local » est obligatoire
+     (vérifiable avec « ? »)
+
+🔹 Sur les PC (champ Link Local Address) :
+
+   | Équipement | Link-local |
+   |------------|------------|
+   | PC1        | FE80::1:1  |
+   | PC2        | FE80::1:2  |
+   | PC3        | FE80::2:1  |
+
+   → Le préfixe FE80 reste toujours le même ; seule la
+     partie hôte identifie la machine
+
+----------------------------------------------
+📋 10. RÉCAPITULATIF DES COMMANDES
+----------------------------------------------
+
+   | Commande                                 | Rôle                           |
+   |------------------------------------------|--------------------------------|
+   | ipv6 unicast-routing                     | Active le routage IPv6         |
+   | ipv6 address <adresse>/64                | Adresse globale sur interface  |
+   | ipv6 address <FE80::x> link-local        | Fixe la link-local             |
+   | no shutdown                              | Active l'interface             |
+   | show ipv6 interface brief                | Adresses IPv6 des interfaces   |
+   | show ipv6 route                          | Table de routage IPv6          |
+   | show interfaces <int>                    | Adresse MAC de l'interface     |
+   | ping <adresse IPv6>                      | Test de connectivité           |
+
+
+----------------------------------------------
+📌 À RETENIR
+----------------------------------------------
+
+1️⃣ Toutes les commandes IPv6 = commandes IPv4 avec
+   « ipv6 » à la place de « ip »
+
+2️⃣ Pas de masque : on écrit simplement /64
+
+3️⃣ Sans « ipv6 unicast-routing », le routeur NE ROUTE PAS
+   l'IPv6 → les réseaux ne communiquent pas
+
+4️⃣ Une interface IPv6 a toujours une link-local (FE80::)
+   même sans configuration ; Cisco la crée en EUI-64
+
+5️⃣ Dans la table de routage : C = réseau connecté (/64),
+   L = adresse de l'interface (/128)
+
+6️⃣ On peut fixer la link-local avec
+   « ipv6 address FE80::x link-local »
+
+7️⃣ Sur les PC : adresse /64 + passerelle = adresse du
+   routeur dans ce réseau
