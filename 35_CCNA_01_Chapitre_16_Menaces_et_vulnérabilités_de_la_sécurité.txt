@@ -1,0 +1,342 @@
+======================================================================
+    🛡️ MENACES ET VULNÉRABILITÉS DE LA SÉCURITÉ (CCNA 1 - Chapitre 16)
+======================================================================
+
+📋 SOMMAIRE DE LA LEÇON :
+
+   1. Menace, vulnérabilité et acteur de menace
+   2. Les 4 types de menaces
+   3. Menaces internes/externes, intentionnelles ou non
+   4. Les 3 types de vulnérabilités
+   5. La sécurité physique (le pilier oublié)
+   6. Les logiciels malveillants (malwares)
+   7. Les 3 catégories d'attaques réseau
+   8. Atténuer les menaces
+
+----------------------------------------------
+🎯 OBJECTIFS DE LA LEÇON
+----------------------------------------------
+
+À la fin de cette leçon, vous saurez :
+
+   → Définir menace, vulnérabilité et acteur de menace
+   → Décrire les types de menaces et de vulnérabilités
+   → Expliquer l'importance de la sécurité physique
+   → Reconnaître virus, ver et cheval de Troie
+   → Décrire les attaques de reconnaissance, d'accès et de
+     déni de service
+   → Citer les principales mesures de protection
+
+   💡 Ce chapitre présente les bases de la sécurité réseau ;
+      ce n'est pas un cours de cybersécurité complet
+
+----------------------------------------------
+⚠️ 1. MENACE, VULNÉRABILITÉ, ACTEUR DE MENACE
+----------------------------------------------
+
+   | Terme              | Définition                                     |
+   |--------------------|------------------------------------------------|
+   | Vulnérabilité      | Faiblesse d'un système (une faille)            |
+   | Menace             | Danger qu'une vulnérabilité soit exploitée     |
+   | Acteur de menace   | Personne qui cherche à exploiter la faille     |
+   |                    | (le « hacker » dans le langage courant)        |
+
+   → Sans menace, pas besoin de sécurité : le but de la
+     sécurité est de faire face aux menaces
+   → C'est la vulnérabilité qui donne naissance à la menace
+
+----------------------------------------------
+🎯 2. LES 4 TYPES DE MENACES
+----------------------------------------------
+
+   | Menace                            | Exemple                          |
+   |-----------------------------------|----------------------------------|
+   | Vol d'informations                | Accéder à des données sans       |
+   |                                   | autorisation                     |
+   | Perte et manipulation de données  | Supprimer ou modifier des données|
+   | Usurpation d'identité             | Se faire passer pour quelqu'un   |
+   | Interruption de service           | Bloquer l'accès à un service     |
+
+----------------------------------------------
+🧭 3. ORIGINE DES MENACES
+----------------------------------------------
+
+🔹 Interne ou externe :
+
+   → On pense surtout aux menaces EXTERNES
+   → Mais une grande partie des attaques viennent de
+     l'INTÉRIEUR : une fois dans le système, l'attaquant a
+     le champ libre
+
+🔹 Intentionnelle ou non :
+
+   → Intentionnelle : quelqu'un veut vraiment nuire
+   → Non intentionnelle : erreur d'un utilisateur légitime
+     (session laissée ouverte, mauvaise manipulation...)
+   → ⚠️ Erreur de débutant : oublier les menaces non
+     intentionnelles
+
+🔹 Gérer tout cela est le rôle du RSSI (Responsable de la
+   Sécurité des Systèmes d'Information)
+
+----------------------------------------------
+🕳️ 4. LES 3 TYPES DE VULNÉRABILITÉS
+----------------------------------------------
+
+🔹 Tout équipement présente des vulnérabilités : pour
+   l'utiliser, il faut ouvrir des services et des ports
+
+🔹 ① Vulnérabilité TECHNOLOGIQUE
+
+   → Faiblesse inhérente à une technologie, difficile à
+     corriger
+   → Ex. TCP/IP : on peut ouvrir énormément de sessions à la
+     fois → déni de service
+   → Ex. Telnet : les échanges circulent EN CLAIR (non
+     chiffrés) → quelqu'un qui intercepte le trafic peut
+     lire les commandes et mots de passe
+
+🔹 ② Vulnérabilité de CONFIGURATION
+
+   → Faiblesse due à une mauvaise configuration (corrigible)
+   → Ex. : Telnet au lieu de SSH, mots de passe faibles
+     (« cisco123 »), protocoles de routage sans
+     authentification (un routeur pirate peut récupérer les
+     routes)
+
+🔹 ③ Vulnérabilité de la POLITIQUE DE SÉCURITÉ
+
+   → Absence de politique de sécurité (on fait « au mieux »)
+   → Manque de continuité de l'authentification
+   → Contrôles d'accès logiques non appliqués
+   → Installations de logiciels/matériels non conformes
+   → Pas de plan de reprise après sinistre
+   → Plan de sauvegarde et restauration mal fait
+
+----------------------------------------------
+🏢 5. LA SÉCURITÉ PHYSIQUE
+----------------------------------------------
+
+🔹 Le pilier de base, souvent oublié :
+
+   → Un serveur posé dans le bureau de la secrétaire peut
+     être emporté par n'importe qui
+   → Toute la sécurité logique ne sert à rien si l'accès
+     physique est libre
+
+🔹 Témoignage du formateur :
+
+   → Une entreprise de ~5 000 personnes à l'arrêt : un
+     technicien avait coupé l'interrupteur électrique de la
+     salle serveurs
+   → Aucune compétence de piratage nécessaire, juste une
+     erreur humaine
+   → Questions à se poser : qui avait le droit d'entrer ?
+     Existe-t-il une alimentation redondante ? Un datacenter
+     de secours ?
+
+🔹 Contrôler l'accès humain :
+
+   → Badges, accueil, portes, authentification des personnes
+   → Un attaquant passe l'essentiel de son temps à essayer
+     d'atteindre les équipements : une mauvaise sécurité
+     physique lui fait gagner énormément de temps
+
+🔹 Les 4 catégories de menaces physiques :
+
+   | Catégorie        | Exemples                                       |
+   |------------------|------------------------------------------------|
+   | Matérielles      | Dommages aux serveurs, routeurs, switchs,      |
+   |                  | câbles, postes de travail                      |
+   | Environnementales| Températures extrêmes (mauvaise climatisation),|
+   |                  | humidité, inondation, canalisations proches    |
+   | Électriques      | Pics de tension, alimentation insuffisante,    |
+   |                  | bruit électrique, coupure totale               |
+   | Maintenance      | Mauvaise manipulation des composants, pièces   |
+   |                  | de rechange non disponibles, contrat non tenu  |
+
+----------------------------------------------
+🦠 6. LES LOGICIELS MALVEILLANTS (MALWARES)
+----------------------------------------------
+
+🔹 Malware = MALicious softWARE (logiciel malveillant)
+
+   | Type              | Caractéristiques                               |
+   |-------------------|------------------------------------------------|
+   | Virus             | S'insère dans un autre programme ; se propage  |
+   |                   | grâce à une action humaine ; vise à détruire   |
+   |                   | (fichiers, système, réseau)                    |
+   | Ver (worm)        | Comme le virus, mais AUTONOME : pas besoin de  |
+   |                   | programme hôte ni d'intervention humaine       |
+   | Cheval de Troie   | Cache quelque chose de malveillant dans un     |
+   |                   | logiciel qui semble utile                      |
+
+🔹 Le cheval de Troie :
+
+   → Très répandu, notamment dans les logiciels téléchargés
+     illégalement (versions « gratuites » piratées)
+   → On ne sait jamais ce qui est caché derrière
+   → Facile à produire avec des outils existants
+
+----------------------------------------------
+⚔️ 7. LES 3 CATÉGORIES D'ATTAQUES RÉSEAU
+----------------------------------------------
+
+🔹 ① ATTAQUE DE RECONNAISSANCE
+
+   → Collecter le maximum d'informations sur une cible
+   → C'est l'étape la plus longue : quelques mois pour un
+     attaquant, des années pour de l'espionnage entre
+     États ou grands groupes
+   → Sources : informations publiques (finances, site web),
+     requêtes whois / DNS, balayage d'adresses IP et de
+     ports, documents qui traînent sur Internet
+   → Le formateur montre qu'une simple recherche avancée
+     sur un moteur de recherche peut faire remonter des
+     fichiers mis en ligne par erreur
+   → Sans reconnaissance, les autres attaques sont
+     impossibles
+
+🔹 ② ATTAQUE D'ACCÈS
+
+   → Obtenir un accès non autorisé au système
+
+   | Technique                  | Principe                                |
+   |----------------------------|-----------------------------------------|
+   | Attaque par mot de passe   | Deviner/forcer un mot de passe          |
+   |                            | (force brute, dictionnaire)             |
+   | Exploitation de la         | Profiter de la confiance entre          |
+   | confiance                  | personnes ou systèmes                   |
+   | Redirection de port        | Passer par une machine de confiance     |
+   |                            | pour en atteindre une autre             |
+   | Homme du milieu (MITM)     | S'intercaler entre la victime et sa     |
+   |                            | destination pour copier le trafic       |
+
+   → Exemple d'exploitation de la confiance : le PC
+     professionnel d'un parent prêté à un enfant, dont un
+     « ami » récupère les données
+     → seule parade : la SENSIBILISATION des utilisateurs
+   → Exemple d'homme du milieu : un faux serveur DHCP
+     annonce la machine de l'attaquant comme passerelle ;
+     tout le trafic passe par elle
+
+🔹 ③ DÉNI DE SERVICE (DoS / DDoS)
+
+   → Envoyer tellement de requêtes qu'un serveur ne peut
+     plus répondre aux utilisateurs légitimes
+   → Coût énorme : quelques secondes d'indisponibilité d'un
+     grand site marchand = des dizaines de milliers de
+     dollars perdus
+   → DoS = une seule machine ; DDoS (Distributed) =
+     beaucoup de machines
+   → Aujourd'hui on parle surtout de DDoS : une seule
+     machine ne suffit plus face aux protections modernes
+   → Les machines utilisées sont des ZOMBIES (infectées,
+     souvent par cheval de Troie) qui forment un BOTNET
+   → Parades : systèmes à jour et robustes, bascule vers
+     un autre datacenter
+
+----------------------------------------------
+🧰 8. ATTÉNUER LES MENACES
+----------------------------------------------
+
+🔹 ① La défense en profondeur (par couches)
+
+   → Plusieurs équipements et technologies qui protègent
+     en même temps (« en tandem ») : pare-feu → IPS →
+     antivirus...
+   → UTM (Unified Threat Management) : un seul boîtier qui
+     regroupe pare-feu, IPS, IDS, antivirus...
+
+🔹 ② Les sauvegardes
+
+   → Garantir la DISPONIBILITÉ de l'information, même
+     après une attaque
+   → 4 points clés :
+
+   | Point       | Bonne pratique                                     |
+   |-------------|----------------------------------------------------|
+   | Fréquence   | Sauvegardes régulières (ex. : complète chaque mois,|
+   |             | incrémentielle chaque jour)                        |
+   | Stockage    | Lieu sécurisé, hors site, transferts protégés      |
+   | Sécurité    | Sauvegardes protégées par des mots de passe forts  |
+   | Validation  | Tester régulièrement la RESTAURATION               |
+
+   → Mauvaise surprise classique : découvrir le jour J que
+     les sauvegardes des 6 derniers mois sont inutilisables
+
+🔹 ③ Les mises à jour et correctifs de sécurité
+
+   → La plupart des mises à jour Windows sont des
+     correctifs de sécurité
+
+🔹 ④ AAA (Authentication, Authorization, Accounting)
+
+   | A               | Question                  | Exemple                       |
+   |-----------------|---------------------------|-------------------------------|
+   | Authentification| Qui es-tu vraiment ?      | Mot de passe + 2e facteur     |
+   |                 |                           | (SMS, application, biométrie) |
+   | Autorisation    | Qu'as-tu le droit de      | Limite de retrait de la carte |
+   |                 | faire ?                   | bancaire, droits sur fichiers |
+   | Traçabilité     | Qu'as-tu fait, quand ?    | Historique des opérations     |
+   | (Accounting)    |                           | bancaires                     |
+
+   → Exemple de double authentification : carte bancaire
+     (ce que l'on possède) + code PIN (ce que l'on sait)
+
+🔹 ⑤ Le pare-feu
+
+   → Filtre le trafic entre l'intérieur et l'extérieur
+   → Règle de base : le trafic venant d'Internet n'entre
+     pas... sauf s'il répond à une demande faite depuis
+     l'intérieur
+
+   | Technique de filtrage         | Principe                                |
+   |-------------------------------|-----------------------------------------|
+   | Filtrage de paquets           | Selon les adresses IP ou MAC            |
+   | Filtrage des applications     | Selon les numéros de port (ex. bloquer  |
+   |                               | Telnet 23, exiger SFTP au lieu de FTP)  |
+   | Inspection avec état (SPI)    | Le paquet entrant doit être une réponse |
+   | (Stateful Packet Inspection)  | légitime à une requête interne          |
+
+🔹 ⑥ La sécurité des terminaux (points d'extrémité)
+
+   → Politiques de sécurité sur les postes : droits
+     administrateur ou non, antivirus, anti-malware...
+   → Suites complètes (« Internet Security », « Total
+     Security ») : pare-feu personnel, protection Web,
+     gestionnaire de mots de passe...
+
+🔹 Prochaine vidéo : la partie pratique (AutoSecure, mots
+   de passe...) sur Packet Tracer
+
+
+----------------------------------------------
+📌 À RETENIR
+----------------------------------------------
+
+1️⃣ Vulnérabilité = faille ; menace = risque d'exploitation ;
+   acteur de menace = celui qui exploite
+
+2️⃣ 4 menaces : vol d'informations, perte/manipulation de
+   données, usurpation d'identité, interruption de service
+
+3️⃣ Ne pas oublier les menaces INTERNES et NON
+   intentionnelles
+
+4️⃣ 3 vulnérabilités : technologique, de configuration, de
+   politique de sécurité
+
+5️⃣ Sécurité physique = pilier de base
+   → menaces matérielles, environnementales, électriques,
+     de maintenance
+
+6️⃣ Virus (besoin d'un hôte), ver (autonome), cheval de
+   Troie (caché dans un logiciel utile)
+
+7️⃣ 3 attaques : reconnaissance (la plus longue), accès,
+   déni de service (DDoS via botnets)
+
+8️⃣ Protection : défense en profondeur, sauvegardes testées,
+   mises à jour, AAA, pare-feu (SPI), sécurité des
+   terminaux
