@@ -1,0 +1,440 @@
+======================================================================
+    🌐 ADRESSAGE IPv6 (CCNA 1 - Chapitre 12)
+======================================================================
+
+📋 SOMMAIRE DE LA LEÇON :
+
+   1. Pourquoi passer à l'IPv6 ?
+   2. Coexistence IPv4 / IPv6
+   3. Structure d'une adresse IPv6
+   4. Les 2 règles de simplification
+   5. Les types d'adresses IPv6 (pas de broadcast !)
+   6. Préfixe et ID d'interface (/64)
+   7. Adresse de monodiffusion globale (GUA)
+   8. Découper en sous-réseaux : un jeu d'enfant
+   9. Attribuer l'ID d'interface (manuel, SLAAC, DHCPv6)
+   10. EUI-64 : construire l'ID à partir de l'adresse MAC
+   11. Adresses link-local (FE80::/10)
+   12. Adresses de multidiffusion importantes
+
+----------------------------------------------
+🎯 OBJECTIFS DE LA LEÇON
+----------------------------------------------
+
+À la fin de cette leçon, vous saurez :
+
+   → Expliquer pourquoi l'IPv6 remplace l'IPv4
+   → Lire, écrire et simplifier une adresse IPv6
+   → Reconnaître les adresses globales, link-local, ULA
+     et multicast
+   → Découper un préfixe IPv6 en sous-réseaux
+   → Expliquer SLAAC, DHCPv6 et EUI-64
+
+   💬 Message du formateur : l'IPv6 fait peur à cause de la
+      taille des adresses, mais il est en réalité BEAUCOUP
+      plus simple que l'IPv4
+
+----------------------------------------------
+⚠️ 1. POURQUOI PASSER À L'IPv6 ?
+----------------------------------------------
+
+🔹 Les limites de l'IPv4 :
+
+   → ~2,8 milliards d'adresses utilisables, quasiment toutes
+     attribuées
+   → Explosion des appareils connectés : objets connectés,
+     IA, big data... ~20 milliards aujourd'hui, 50 milliards
+     annoncés
+   → Découpage en sous-réseaux compliqué (cf. VLSM)
+
+🔹 L'IPv6 résout :
+
+   → Le manque d'adresses
+   → Des problèmes de conception, de sécurité et de
+     simplicité de l'adresse
+
+----------------------------------------------
+🔄 2. COEXISTENCE IPv4 / IPv6
+----------------------------------------------
+
+   | Technique      | Principe                                            |
+   |----------------|-----------------------------------------------------|
+   | Double pile    | IPv4 et IPv6 actifs en même temps sur l'équipement  |
+   | (dual stack)   | (Windows depuis Vista ; priorité à l'IPv6)          |
+   | Tunnel         | Le paquet IPv6 est encapsulé dans un paquet IPv4    |
+   | (6to4)         | pour traverser un réseau qui ne parle qu'IPv4       |
+   | Traduction     | Le routeur prête une adresse IPv4 le temps de       |
+   | (NAT64)        | traverser un réseau IPv4, puis remet l'IPv6         |
+
+   💡 Ces techniques sont de moins en moins utilisées : la
+      plupart des réseaux opérateurs supportent aujourd'hui
+      l'IPv6, souvent en priorité
+
+----------------------------------------------
+🔢 3. STRUCTURE D'UNE ADRESSE IPv6
+----------------------------------------------
+
+🔹 L'information la plus importante :
+
+   → Une adresse IPv6 = 128 bits
+   → Découpée en 8 HEXTETS de 16 bits
+     (128 ÷ 8 = 16)
+   → Hextets séparés par « : » (deux-points)
+
+🔹 Pourquoi l'hexadécimal ?
+
+   → 16 bits par bloc → trop long en décimal
+   → Chaque chiffre hexadécimal = 4 bits
+   → Donc 4 chiffres hexadécimaux par hextet
+
+   Rappel hexadécimal : 0 1 2 3 4 5 6 7 8 9 A B C D E F
+                        (A=10, B=11, C=12, D=13, E=14, F=15)
+
+🔹 Exemple d'un hextet :
+
+   2001 = 0010 0000 0000 0001
+
+🔹 Exemple d'adresse complète :
+
+   2001:0DB8:CAFE:0001:0000:0000:0000:0C30
+
+   → 8 hextets ✅
+   → Majuscules ou minuscules : aucune importance
+
+----------------------------------------------
+✂️ 4. LES 2 RÈGLES DE SIMPLIFICATION
+----------------------------------------------
+
+🔹 RÈGLE 1 : supprimer les 0 de GAUCHE dans chaque hextet
+
+   0DB8 → DB8     0001 → 1     0000 → 0     0C30 → C30
+
+   ⚠️ JAMAIS les 0 de droite : 10 ≠ 1 !
+
+   2001:DB8:CAFE:1:0:0:0:C30
+
+🔹 RÈGLE 2 : remplacer une suite d'hextets à 0 par « :: »
+
+   2001:DB8:CAFE:1::C30
+
+   ⚠️ Le « :: » ne peut être utilisé qu'UNE SEULE FOIS
+      (sinon on ne sait plus combien de 0 il remplace)
+
+🔹 Exemple avec deux suites de zéros :
+
+   2001:0DB8:0000:0000:1234:0000:0000:0023
+
+   ✅ 2001:DB8::1234:0:0:23
+   ✅ 2001:DB8:0:0:1234::23
+   ❌ 2001:DB8::1234::23   (deux fois « :: » = interdit)
+
+   → Aucune règle n'impose laquelle choisir
+
+----------------------------------------------
+🏷️ 5. LES TYPES D'ADRESSES IPv6
+----------------------------------------------
+
+🔹 Trois types de communication :
+
+   → Monodiffusion (unicast) : 1 destinataire
+   → Multidiffusion (multicast) : un groupe
+   → Anycast : le plus proche d'un groupe
+
+🔹 ⚠️ IL N'Y A PLUS DE DIFFUSION (BROADCAST) EN IPv6
+
+   → On utilise un groupe multicast pour joindre tout le monde
+   → Conséquence : plus besoin de réserver la première
+     adresse (réseau) et la dernière (diffusion) comme en IPv4
+
+🔹 Les adresses de monodiffusion :
+
+   | Type            | Plage            | Équivalent IPv4       |
+   |-----------------|------------------|-----------------------|
+   | Globale (GUA)   | 2000::/3         | Adresse publique      |
+   |                 | (commence par 2 ou 3) |                  |
+   | Link-local (LLA)| FE80::/10        | APIPA (169.254)       |
+   | Locale unique   | FC00::/7         | Adresse privée        |
+   | (ULA)           | (FC00 → FDFF)    | (RFC 1918)            |
+   | Bouclage        | ::1              | 127.0.0.1             |
+
+🔹 Les adresses locales uniques (ULA) :
+
+   → Peu utilisées : réseaux fermés, réseaux industriels
+     non connectés à Internet
+   → Plus besoin d'adressage privé + NAT : il y a assez
+     d'adresses pour tout le monde
+
+🔹 Et le NAT ?
+
+   → Inutile en IPv6 (il n'existait que par manque d'adresses)
+   → Il cache le réseau interne, mais ce n'est pas son rôle :
+     un pare-feu/proxy sert à ça
+   → Le formateur le déconseille : il ralentit les débits
+
+----------------------------------------------
+📐 6. PRÉFIXE ET ID D'INTERFACE
+----------------------------------------------
+
+🔹 Plus de masque de sous-réseau en IPv6 !
+
+   → On écrit seulement la longueur de préfixe : /64
+   → Pour les réseaux d'utilisateurs : TOUJOURS /64
+
+🔹 Les 2 parties :
+
+   ┌────────────────────────┬─────────────────────────┐
+   │   PRÉFIXE (64 bits)    │ ID D'INTERFACE (64 bits)│
+   │   ≈ partie réseau      │ ≈ partie hôte           │
+   └────────────────────────┴─────────────────────────┘
+
+   2001:DB8:CAFE:1 : : C30 /64
+   └──── préfixe ───┘ └ ID ┘
+   (4 hextets × 16 = 64 bits)
+
+----------------------------------------------
+🌍 7. ADRESSE DE MONODIFFUSION GLOBALE (GUA)
+----------------------------------------------
+
+🔹 Toujours commencer par 2 ou 3 :
+
+   → Les 3 premiers bits sont fixés à 001
+   → 0010 = 2 et 0011 = 3
+   → On n'utilise que 2/16 = 1/8 des adresses IPv6 possibles
+     ... et c'est déjà largement suffisant
+
+🔹 Structure d'une GUA :
+
+   ┌───────────────────────┬──────────────┬──────────────────┐
+   │ Préfixe de routage    │ ID de sous-  │ ID d'interface   │
+   │ global : 48 bits      │ réseau :     │ : 64 bits        │
+   │ (donné par l'opérateur)│ 16 bits     │                  │
+   └───────────────────────┴──────────────┴──────────────────┘
+
+   Exemple : l'opérateur donne 2001:DB8:CAFE::/48
+   → Les 48 bits sont « sacrés » (on n'y touche pas)
+   → 16 bits pour créer ses sous-réseaux
+   → 64 bits pour les hôtes
+
+🔹 Les chiffres (pour se faire peur... ou se rassurer) :
+
+   → Sous-réseaux par /48 : 2¹⁶ = 65 536
+   → Hôtes par sous-réseau : 2⁶⁴ ≈ 18 milliards de milliards
+   → Préfixes /48 possibles : 2⁴⁵ ≈ 35 000 milliards
+     (48 − 3 bits fixés)
+   → Total GUA : 2⁴⁵ × 2¹⁶ × 2⁶⁴ ≈ 4 × 10³⁷ adresses
+
+🔹 Conséquence :
+
+   → Une adresse donnée n'a plus besoin d'être reprise,
+     changée ni « prêtée »
+
+----------------------------------------------
+✂️ 8. DÉCOUPER EN SOUS-RÉSEAUX
+----------------------------------------------
+
+🔹 Exemple : 8 sous-réseaux à partir de 2001:DB8:CAFE::/48
+
+   → On utilise simplement l'ID de sous-réseau (4e hextet) :
+
+   2001:DB8:CAFE:1::/64
+   2001:DB8:CAFE:2::/64
+   2001:DB8:CAFE:3::/64
+   ...
+   2001:DB8:CAFE:8::/64
+
+   ⏱️ Fait en 5 secondes, comme promis !
+
+🔹 Ce qu'on ne fait PLUS :
+
+   → Trier du plus grand au plus petit (VLSM)
+   → Calculer des masques variables
+   → Économiser les adresses : chaque /64 contient
+     18 milliards de milliards d'adresses
+
+   💬 « Amusez-vous, faites-vous plaisir » : il n'y a
+      aucune nécessité de découper plus finement
+
+----------------------------------------------
+🛠️ 9. ATTRIBUER L'ID D'INTERFACE
+----------------------------------------------
+
+🔹 Méthode 1 – MANUELLE (statique)
+
+   → Pour les routeurs, serveurs, imprimantes...
+   → On définit sa propre politique, par exemple :
+       ::1 → ::50   pour les serveurs
+   → Pas besoin de convertir : écrire « 50 » directement
+   → Astuce de certaines entreprises : reprendre l'adresse
+     IPv4 dans l'ID d'interface (ex. ...::10 pour le PC
+     qui a 192.168.1.10)
+
+   ⚠️ Remarque : le formateur attribue au routeur
+      l'ID « tout à zéro » ; en pratique Cisco réserve
+      cet ID (adresse anycast du routeur de sous-réseau)
+      et on donne généralement ::1 au routeur
+
+🔹 Méthode 2 – DYNAMIQUE avec SLAAC
+   (StateLess Address AutoConfiguration)
+
+   ① Le PC se connecte et envoie un RS
+      (Router Solicitation) : « donnez-moi une adresse »
+   ② Le routeur répond par un RA (Router Advertisement)
+      contenant le PRÉFIXE et sa propre adresse (passerelle)
+   ③ Le PC génère lui-même son ID d'interface
+   ④ Il vérifie que personne n'a la même adresse
+      (DAD – détection d'adresse dupliquée)
+      → Si quelqu'un répond, il en change
+      → Avec 2⁶⁴ possibilités, c'est extrêmement rare
+
+   → Windows (depuis Vista/7) : ID d'interface ALÉATOIRE
+   → Cisco : ID d'interface en EUI-64 (voir section 10)
+
+🔹 Méthode 3 – SLAAC + DHCPv6 SANS ÉTAT (stateless)
+
+   → Le RA donne le préfixe ET l'adresse du serveur DHCPv6
+   → Le PC fait son adresse lui-même (SLAAC)
+   → Le serveur DHCPv6 fournit les infos en plus :
+     DNS, nom de domaine...
+
+🔹 Méthode 4 – DHCPv6 AVEC ÉTAT (stateful)
+
+   → Pas de SLAAC : le serveur DHCPv6 donne TOUT
+     (adresse, passerelle, DNS...)
+   → Le formateur recommande de configurer le DHCPv6 pour
+     FIXER l'adresse de chaque machine : elle ne change
+     plus jamais → identification facile des équipements
+
+----------------------------------------------
+🔧 10. EUI-64 : L'ID À PARTIR DE L'ADRESSE MAC
+----------------------------------------------
+
+🔹 Principe :
+
+   → Adresse MAC = 48 bits ; ID d'interface = 64 bits
+   → On insère FFFE au milieu (+16 bits)
+   → On inverse le 7e bit du premier octet
+
+🔹 Exemple : MAC FC:99:47:75:CE:E0
+
+   ① Inverser le 7e bit :
+      FC = 1111 1100
+                 ↑ 7e bit : 0 → 1
+           1111 1110 = FE
+
+   ② Couper la MAC en deux et insérer FFFE :
+      FE99:47 | FF:FE | 75:CEE0
+
+   ③ ID d'interface : FE99:47FF:FE75:CEE0
+
+   Adresse complète :
+   2001:DB8:CAFE:1:FE99:47FF:FE75:CEE0/64
+
+🔹 Pourquoi Microsoft ne l'utilise pas ?
+
+   → L'adresse MAC du PC est visible publiquement sur
+     Internet (il suffit de retirer FFFE et réinverser le
+     7e bit) → risque pour la sécurité / vie privée
+   → Pour les équipements réseau Cisco (switchs, routeurs),
+     ce n'est pas gênant : ils ne naviguent pas sur Internet
+
+   💡 C'est le système qui fait ce calcul, pas vous
+
+----------------------------------------------
+🔗 11. ADRESSES LINK-LOCAL (FE80::/10)
+----------------------------------------------
+
+🔹 Plage : FE80 à FEBF (en pratique tout le monde utilise
+   FE80)
+
+🔹 Caractéristiques :
+
+   → Comme l'APIPA en IPv4 : ne sort JAMAIS du réseau local
+     (non routable)
+   → OBLIGATOIRE sur toute interface IPv6, même si elle a
+     déjà une adresse globale
+   → Unique seulement dans son réseau local
+
+🔹 Conséquence :
+
+   → Un routeur peut avoir la MÊME adresse link-local sur
+     toutes ses interfaces (chaque interface = un réseau
+     local différent)
+   → Deux PC d'un même réseau local ne peuvent pas avoir
+     la même
+
+🔹 À quoi elle sert :
+
+   → Identifier les équipements
+   → Servir de passerelle par défaut (recommandé)
+
+🔹 Exemple de convention de nommage :
+
+   FE80::Y:X
+   → Y = numéro du sous-réseau
+   → X = numéro du routeur
+   → FE80::2:5 = routeur n°5 du sous-réseau n°2
+
+   → Sinon, on laisse les équipements se l'attribuer seuls
+
+----------------------------------------------
+📡 12. ADRESSES DE MULTIDIFFUSION IMPORTANTES
+----------------------------------------------
+
+🔹 Pourquoi pas de diffusion ?
+
+   → Une diffusion devrait viser 18 milliards de milliards
+     d'adresses possibles : impensable
+   → On envoie à un GROUPE dont les machines sont membres
+
+   | Adresse  | Nom                         | Qui reçoit ?               |
+   |----------|-----------------------------|----------------------------|
+   | FF02::1  | Groupe « tous les nœuds »   | Tous les périphériques du  |
+   |          | (all-nodes)                 | réseau local               |
+   | FF02::2  | Groupe « tous les routeurs »| Tous les routeurs          |
+   |          | (all-routers)               |                            |
+
+🔹 Rejoindre le groupe des routeurs :
+
+   → Activer le routage IPv6 sur le routeur :
+       Router(config)# ipv6 unicast-routing
+   → Le routeur rejoint FF02::2 et se fait connaître de ses
+     voisins
+   → Utile pour les protocoles de routage
+
+🔹 Prochaine vidéo : la configuration IPv6. Astuce : c'est
+   comme en IPv4, on ajoute « v6 » :
+       ip address  → ipv6 address
+       ip route    → ipv6 route
+       show ip ... → show ipv6 ...
+
+
+----------------------------------------------
+📌 À RETENIR
+----------------------------------------------
+
+1️⃣ IPv6 = 128 bits = 8 hextets de 16 bits en hexadécimal,
+   séparés par « : »
+
+2️⃣ Simplification :
+   → Règle 1 : retirer les 0 de gauche de chaque hextet
+   → Règle 2 : « :: » pour une suite de 0, UNE seule fois
+
+3️⃣ Pas de broadcast en IPv6 → multicast (FF02::1)
+
+4️⃣ Types d'adresses :
+   → GUA (publique) : commence par 2 ou 3 (2000::/3)
+   → Link-local : FE80::/10, obligatoire, non routable
+   → ULA (privée) : FC00::/7, rarement utilisée
+   → Bouclage : ::1
+
+5️⃣ Réseaux d'utilisateurs = /64
+   → 48 bits opérateur + 16 bits sous-réseau + 64 bits hôte
+   → 65 536 sous-réseaux de 2⁶⁴ hôtes chacun
+
+6️⃣ ID d'interface : manuel, SLAAC (RS/RA), SLAAC + DHCPv6
+   sans état, DHCPv6 avec état
+
+7️⃣ EUI-64 : MAC + FFFE au milieu + 7e bit inversé
+
+8️⃣ Plus de NAT, plus de VLSM : découper = changer le
+   4e hextet
