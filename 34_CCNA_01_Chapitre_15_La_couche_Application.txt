@@ -1,0 +1,313 @@
+======================================================================
+    📱 LA COUCHE APPLICATION (CCNA 1 - Chapitre 15)
+======================================================================
+
+📋 SOMMAIRE DE LA LEÇON :
+
+   1. Les couches application, présentation et session
+   2. Les protocoles de la couche application
+   3. Client-serveur vs peer-to-peer
+   4. DNS : traduire un nom en adresse IP
+   5. HTTP / HTTPS : afficher une page web
+   6. La messagerie : SMTP, POP et IMAP
+   7. DHCP : obtenir une adresse IP
+   8. Le partage de fichiers : FTP, TFTP, SMB
+
+----------------------------------------------
+🎯 OBJECTIFS DE LA LEÇON
+----------------------------------------------
+
+À la fin de cette leçon, vous saurez :
+
+   → Expliquer le rôle des couches 5, 6 et 7 du modèle OSI
+   → Différencier les modèles client-serveur et peer-to-peer
+   → Expliquer le fonctionnement de DNS, HTTP, SMTP,
+     POP/IMAP, DHCP, FTP et SMB
+
+   💡 Chapitre essentiellement théorique
+
+----------------------------------------------
+🧱 1. APPLICATION, PRÉSENTATION, SESSION
+----------------------------------------------
+
+🔹 Couche 7 – APPLICATION
+
+   → Fournit l'interface entre les applications et le réseau
+   → Sans elle, un navigateur web ne serait qu'un programme
+     utilisable en local : c'est elle qui le rend capable
+     de communiquer sur le réseau
+
+🔹 Couche 6 – PRÉSENTATION, en 3 mots :
+
+   → CODER : mettre les données dans un format adapté
+   → COMPRESSER : réduire la taille des données
+   → CHIFFRER : ajouter une protection (on dit souvent
+     « crypter », mais le bon terme est « chiffrer »)
+
+🔹 Couche 5 – SESSION
+
+   → Établit, gère et ferme la session entre émetteur et
+     destinataire (négociations, taille de fenêtre...)
+
+🔹 Dans le modèle TCP/IP :
+
+   → Ces 3 couches sont regroupées en UNE seule couche
+     « application »
+   → Le formateur approuve : les rôles de présentation et
+     session sont « cachés », difficiles à séparer
+
+----------------------------------------------
+📜 2. LES PROTOCOLES DE LA COUCHE APPLICATION
+----------------------------------------------
+
+🔹 Ils définissent le format et les informations de
+   contrôle des communications courantes sur Internet
+
+🔹 Ils doivent être compatibles chez la source ET la
+   destination
+
+   | Protocole | Transport | Port(s)        | Rôle                        |
+   |-----------|-----------|----------------|-----------------------------|
+   | DNS       | UDP (TCP) | 53             | Nom → adresse IP            |
+   | DHCP      | UDP       | 67 serveur,    | Attribution d'adresse IP    |
+   |           |           | 68 client      |                             |
+   | HTTP      | TCP       | 80             | Pages web                   |
+   | HTTPS     | TCP       | 443            | Pages web sécurisées        |
+   | SMTP      | TCP       | 25             | Envoi de mails              |
+   | POP3      | TCP       | 110            | Réception de mails          |
+   | IMAP      | TCP       | 143            | Réception de mails          |
+   | FTP       | TCP       | 20 / 21        | Transfert de fichiers       |
+   | TFTP      | UDP       | 69             | Petits fichiers             |
+   | SMB       | TCP       | 445            | Partage de fichiers         |
+
+----------------------------------------------
+🖥️ 3. CLIENT-SERVEUR VS PEER-TO-PEER
+----------------------------------------------
+
+🔹 Client-serveur :
+
+   → Le CLIENT envoie des demandes (PC, tablette,
+     smartphone...)
+   → Le SERVEUR répond aux demandes
+   → La majorité des services réseau fonctionnent ainsi
+   → Deux niveaux :
+     • matériel : machines clientes / machines serveurs,
+       avec un OS client ou serveur
+     • applicatif : protocoles et applications adaptés
+
+🔹 Peer-to-peer (pair à pair) :
+
+   → Chaque équipement est à la fois CLIENT et SERVEUR
+   → Exemple le plus connu : BitTorrent (on télécharge et,
+     en même temps, d'autres téléchargent depuis nous)
+   → Autres : Direct Connect...
+   → Inconvénient majeur : difficile à gérer à grande
+     échelle
+
+----------------------------------------------
+🔎 4. DNS : TRADUIRE UN NOM EN ADRESSE IP
+----------------------------------------------
+
+🔹 DNS = Domain Name System
+
+   → Analogie : le répertoire du téléphone
+     On cherche « Julien », pas son numéro
+   → Le DNS associe un NOM (cisco.com) à une ADRESSE IP
+   → Les systèmes (Windows, Linux) reposent entièrement sur
+     les noms → le DNS est indispensable
+
+🔹 L'ordre de recherche :
+
+   ① Le fichier HOSTS de la machine
+      (C:\Windows\System32\drivers\etc\hosts)
+      → un mini-DNS local : nom ↔ adresse IP
+      → Exemple historique : rediriger un nom de domaine
+        vers 127.0.0.1 empêchait un logiciel de joindre
+        son serveur (le trafic ne quittait jamais le PC)
+
+   ② Le serveur DNS configuré sur la machine
+      → À la maison : souvent la box
+      → En entreprise : un serveur DNS Windows ou Linux,
+        qui connaît les noms internes de l'entreprise
+
+   ③ Pour les noms Internet, ce serveur :
+      → redirige vers un serveur DNS de l'opérateur ou
+        un serveur DNS public, ou
+      → interroge les SERVEURS RACINE
+
+🔹 Les serveurs racine (root) :
+
+   → 13 serveurs racine, nommés de A à M
+     (répliqués à de nombreux endroits du monde)
+   → Un nom de domaine complet se termine par un point :
+     www.google.com.   ← le point final = la racine
+     (le navigateur l'ajoute tout seul)
+
+🔹 Résolution de fr.wikipedia.org (principe) :
+
+   .  (racine) → org → wikipedia → fr
+
+🔹 Commandes utiles :
+
+   ping google.com      → résout d'abord le nom (ici en
+                          IPv6, prioritaire), puis pingue
+   nslookup             → interroger le DNS
+   > cisco.com          → affiche les adresses IPv4 et IPv6
+                          de cisco.com
+
+   → Taper l'adresse IP de cisco.com dans le navigateur
+     ouvre aussi le site : le nom n'est qu'un raccourci
+
+----------------------------------------------
+🌐 5. HTTP / HTTPS
+----------------------------------------------
+
+🔹 Scénario : un utilisateur tape cisco.com
+
+   ① DNS : cisco.com → adresse IP du serveur web
+   ② HTTP : on demande la page HTML à ce serveur
+   ③ Le navigateur affiche la page
+
+🔹 HTTPS = HTTP + une couche de sécurité (chiffrement)
+   → Le fonctionnement reste exactement le même
+
+🔹 Les 3 types de requêtes HTTP :
+
+   | Requête | Rôle                                                |
+   |---------|-----------------------------------------------------|
+   | GET     | Le client demande des données (une page HTML)       |
+   | POST    | Envoyer des données au serveur (formulaire...)      |
+   | PUT     | Téléverser une ressource vers le serveur            |
+   |         | (image, musique, vidéo...)                          |
+
+----------------------------------------------
+✉️ 6. LA MESSAGERIE : SMTP, POP ET IMAP
+----------------------------------------------
+
+🔹 Deux familles de protocoles :
+
+   | Protocole | Nom complet                      | Rôle               |
+   |-----------|----------------------------------|--------------------|
+   | SMTP      | Simple Mail Transfer Protocol    | ENVOYER un mail    |
+   | POP       | Post Office Protocol             | RECEVOIR un mail   |
+   | IMAP      | Internet Message Access Protocol | RECEVOIR un mail   |
+
+🔹 Le trajet d'un mail :
+
+   Client ──SMTP──▶ Serveur de messagerie ──SMTP──▶ Serveur
+   (expéditeur)     (agent de transfert, MTA)       destinataire
+                                                        │
+                                         POP / IMAP     │
+   Client destinataire ◀───(agent de remise, MDA)───────┘
+
+🔹 POP vs IMAP :
+
+   | POP                                | IMAP                                |
+   |------------------------------------|-------------------------------------|
+   | Télécharge le mail sur la machine  | Le mail RESTE sur le serveur        |
+   | Le mail est stocké en local        | On y accède pour le lire            |
+   |                                    | Synchronisé : supprimer un mail le  |
+   |                                    | supprime aussi du serveur           |
+
+   → Aucun n'est « meilleur » : cela dépend du besoin
+   → Exemple de serveur de messagerie : Microsoft Exchange
+
+----------------------------------------------
+📮 7. DHCP : OBTENIR UNE ADRESSE IP
+----------------------------------------------
+
+🔹 Le processus en 4 étapes (IPv4) :
+
+   Client                                    Serveur DHCP
+     │── DHCP DISCOVER (diffusion) ────────────▶│
+     │   source 0.0.0.0 → 255.255.255.255       │
+     │◀── DHCP OFFER ───────────────────────────│
+     │   (vers la MAC du client)                │
+     │── DHCP REQUEST (diffusion) ─────────────▶│
+     │◀── DHCP ACK ─────────────────────────────│
+     │   → l'adresse est attribuée (bail)       │
+
+🔹 Points importants :
+
+   → DISCOVER en diffusion : le client n'a pas encore
+     d'adresse
+   → Plusieurs serveurs peuvent faire une OFFER : le
+     premier qui répond gagne (une entreprise sérieuse a
+     plusieurs serveurs DHCP)
+   → REQUEST aussi en diffusion, pour 2 raisons :
+     • les autres serveurs savent lequel a été choisi
+     • le client n'utilise pas encore l'adresse
+   → Analogie : on ne dort pas dans l'appartement avant
+     d'avoir signé le bail et récupéré les clés (ACK)
+
+🔹 En IPv6 (DHCPv6), même principe, autres noms :
+
+   | IPv4     | IPv6       |
+   |----------|------------|
+   | DISCOVER | SOLICIT    |
+   | OFFER    | ADVERTISE  |
+   | REQUEST  | REQUEST    |
+   | ACK      | REPLY      |
+
+   → Pour les infos seules (DHCPv6 sans état) :
+     INFORMATION-REQUEST
+
+----------------------------------------------
+📂 8. LE PARTAGE DE FICHIERS
+----------------------------------------------
+
+🔹 FTP (File Transfer Protocol)
+
+   → Transfert de fichiers entre client et serveur
+   → TCP → fiable
+   → Exemple de client : FileZilla
+
+🔹 TFTP (Trivial FTP)
+
+   → Version simplifiée de FTP, UDP → rapide et simple
+   → Pour de petits fichiers, par ex. sauvegarder la
+     configuration ou l'image d'un switch/routeur
+
+🔹 SMB (Server Message Block)
+
+   → Partage de fichiers client-serveur, de type
+     demande/réponse
+   → Les serveurs mettent leurs ressources à disposition
+     (disques partagés, imprimantes)
+   → 3 fonctions :
+     • démarrer, authentifier et terminer des sessions
+     • contrôler l'accès aux fichiers et imprimantes
+     • permettre l'échange de messages entre équipements
+
+🔹 FTP vs SMB :
+
+   → FTP : on TRANSFÈRE les fichiers
+   → SMB : connexion de longue durée, on travaille
+     DIRECTEMENT sur le serveur comme sur son propre disque
+
+
+----------------------------------------------
+📌 À RETENIR
+----------------------------------------------
+
+1️⃣ Couche 7 = interface applications/réseau ;
+   couche 6 = coder, compresser, chiffrer ;
+   couche 5 = gérer les sessions
+   → Fusionnées en « application » dans TCP/IP
+
+2️⃣ Client-serveur (majoritaire) vs peer-to-peer
+   (chacun est client et serveur, ex. BitTorrent)
+
+3️⃣ DNS : nom → IP ; hosts → serveur DNS local →
+   opérateur / racine (13 serveurs racine, A à M)
+
+4️⃣ HTTP (80) / HTTPS (443) : requêtes GET, POST, PUT
+
+5️⃣ SMTP (25) envoie ; POP (110) télécharge ;
+   IMAP (143) laisse le mail sur le serveur
+
+6️⃣ DHCP : DISCOVER → OFFER → REQUEST → ACK
+   (IPv6 : SOLICIT → ADVERTISE → REQUEST → REPLY)
+
+7️⃣ FTP (TCP, fiable), TFTP (UDP, simple),
+   SMB (travail direct sur les ressources partagées)
